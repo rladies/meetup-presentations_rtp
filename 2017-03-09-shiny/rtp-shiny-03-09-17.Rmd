@@ -1,0 +1,162 @@
+---
+title: "R / git / GitHub"
+author: "Mine Cetinkaya-Rundel"
+date: "March 9, 2017"
+output: ioslides_presentation
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Welcome to R-Ladies RTP!
+
+## Materials
+
+- All source code at https://github.com/rladies/rtp_20170309_shiny
+    - Download the contents of the repo, we'll need the R scripts and data in the apps folder
+
+- Slides at http://rpubs.com/mine/rladies-shiny-reactivity101
+
+
+# Reactivity 101
+
+## Reactions
+
+The `input$` list stores the current value of each input object under its name
+
+![](img/reactions.png)
+
+## Reactivity 101
+
+Reactivity automatically occurs when an `input` value is used to render an `output` object
+
+```{r eval=FALSE}
+# Define server function required to create the scatterplot --------
+server <- function(input, output) {
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot(
+   ggplot(data = movies, aes_string(x = input$x, y = input$y, 
+                                    color = input$z)) +
+     geom_point(alpha = input$alpha)
+  )
+}
+```
+
+## Let’s build a simple movie browser app!
+
+`movies.Rdata`: Data from IMDB and Rotten Tomatoes on random sample of 651 movies released in the US between 1970 and 2014
+
+`movies_01.R`: Single file app for browsing movies
+
+## Exercise
+
+- Start with `movies_01.R`
+- Add a new `sliderInput` defining the size of points (ranging from 0 to 5), see https://shiny.rstudio.com/reference/shiny/latest/sliderInput.html for help with defining a `sliderInput`
+- Use this variable in the geom of the `ggplot` function as the `size` argument
+- Run the app to ensure that point sizes react when you move the slider
+- Compare your code / output with the person sitting next to / nearby you
+
+## Solution
+
+See `movies_02.R`
+
+## Demo
+
+Suppose you want the option to plot only certain types of movies as well as report how many such movies are plotted:
+
+1. Add a UI element for the user to select which type(s) of movies they want to plot
+2. Filter for chosen title type and save as a new (reactive) expression
+3. Use new data frame (which is reactive) for plotting
+4. Use new data frame (which is reactive) also for reporting number of observations
+
+## Demo - 1
+
+1. Add a UI element for the user to select which type(s) of movies they want to plot
+
+```{r eval=FALSE}
+# Select which types of movies to plot
+checkboxGroupInput(inputId = "selected_type",
+                   label = "Select movie type(s):",
+                   choice = c("Documentary", "Feature Film", "TV Movie"),
+                   selected = "Feature Film")
+```
+
+## Demo - 2
+
+2. Filter for chosen title type and save the new data frame as a reactive expression
+
+**before app:**
+```{r eval=FALSE}
+library(dplyr)
+```
+
+**server:**
+```{r eval=FALSE}
+# Create a subset of data filtering for chosen title types
+movies_subset <- reactive({
+  movies %>%
+    filter(title_type %in% input$selected_type)
+})
+```
+
+*Note:* `reactive({})` creates a cached expression that knows it is out of date when input changes
+
+## Demo - 3
+
+Use new data frame (which is reactive) for plotting
+
+```{r eval=FALSE}
+# Create the scatterplot object the plotOutput function is expecting
+output$scatterplot <- renderPlot({
+  ggplot(data = movies_subset(), aes_string(x = input$x, y = input$y,
+                                            color = input$z)) +
+    geom_point(…) +
+    …
+})
+```
+
+*Note:* Cached - only re-run when inputs change
+
+## Demo - 4 {.smaller}
+
+Use new data frame (which is reactive) also for printing number of observations
+
+**ui:**
+```{r eval=FALSE}
+mainPanel(
+  ...
+  # Print number of obs plotted
+  textOutput(outputId = "n"),
+  ...
+  )
+```
+
+**server:**
+```{r eval=FALSE}
+# Print number of movies plotted
+output$n <- renderText({
+    counts <- movies_subset() %>%
+      group_by(title_type) %>%
+      summarise(count = n()) %>%
+      select(count) %>%
+      unlist()
+    paste("There are", counts, input$selected_type, "movies in this dataset.")
+})
+```
+
+## Altogether
+
+See `movies_03.R`
+
+(also notice the little bit of HTML code, added for visual separation, in the `mainPanel`)
+
+## When to use reactives
+
+- By using a reactive expression for the subsetted data frame, we were able to get away with subsetting once and then using the result twice
+
+- In general, reactive conductors let you
+    - not repeat yourself (i.e. avoid copy-and-paste code) which is a maintenance boon
+    - decompose large, complex (code-wise, not necessarily CPU-wise) calculations into smaller pieces to make them more understandable
+
+- These benefits are similar to what happens when you decompose a large complex R script into a series of small functions that build on each other
