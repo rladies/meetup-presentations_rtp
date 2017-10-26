@@ -15,9 +15,8 @@ library(emo)
 ## Materials
 
 - All source code at https://github.com/rladies/meetup-presentations_rtp/tree/master/2017-10-26-purrr
-    - Download the contents of the repo, we'll need the R scripts and data in the apps folder
 
-- Slides at [to be added]
+- Slides at http://rpubs.com/minebocek/rladies-rtp-purrr
 
 ## Acknowledgements
 
