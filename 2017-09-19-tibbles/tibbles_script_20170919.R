@@ -35,7 +35,10 @@
 # install packages (if you haven't already. only need to do this once!)
 install.packages("tidyverse")
 install.packages("microbenchmark")
+<<<<<<< HEAD
 #install.packages("tibble","microbenchmark") # if you don't want the whole tidyverse
+=======
+>>>>>>> 549196a48ab5c1d9acf5bb274c8141e2f874523b
 
 # load library
 library(tidyverse)
@@ -124,9 +127,10 @@ class(my_df$x) # factor
 my_tib=tibble(x=letters)
 class(my_tib$x) # character
 
-# tibbles will not create row names (?)
+# tibbles will not allow you to assign row names
 row.names(my_df)
-row.names(my_tib) # looks like it did (?)
+row.names(my_tib) # does have row names
+row.names(my_tib)=letters # get an error when you try to assign names
 
 # tibbles will only shows some of output in console window
 my_df
@@ -139,6 +143,7 @@ my_df2
 
 my_tib2=tibble(x=1:3,y=list(1:5,1:10,1:20))
 my_tib2
+# good for survey or sequencing data where cell can change lengths within a given column
 
 # tibbles will do things in sequence 
 my_db3=data.frame(x=1:5,y=x^2)
@@ -154,6 +159,8 @@ my_list
 names(my_list)=letters
 microbenchmark::microbenchmark(as_tibble(my_list),
                                as.data.frame(my_list))
+
+# tibbles stay as tibbles if you take subset
 
 
 # ---- 4.2 tibbles are surly ----
@@ -187,6 +194,7 @@ class(my_tib5)
 class(my_new_tib5)
 
 # do you know of any others?
+
 
 
 # ---- 4.4 exercise ----
