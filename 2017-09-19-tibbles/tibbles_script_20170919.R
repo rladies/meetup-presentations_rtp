@@ -33,7 +33,8 @@
 # ---- 2. set up ----
 
 # install packages (if you haven't already. only need to do this once!)
-install.packages("tidyverse","microbenchmark")
+install.packages("tidyverse")
+install.packages("microbenchmark")
 #install.packages("tibble","microbenchmark") # if you don't want the whole tidyverse
 
 # load library
