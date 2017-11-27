@@ -1,0 +1,132 @@
+---
+title: "Twitter and R"
+author: "Joyce Cahoon"
+date: "Fall 2017"
+output: ioslides_presentation
+widescreen: yes
+transition: faster
+header-includes:
+  - \usepackage{accents}
+---
+
+## Twitter API
+
+> - Twitter is a popular service that allows us to broadcast short messages, $tweets$ 
+
+> - Cultivation of open API development represents another level of evolution in Internet participation. Not just reading and writing content, but co-creating interactions around that content 
+
+> - Twitter has a low barrier for both, we're going to learn how to get started with working with the API in R and go through an example of how parts of the API can be assembled into web applications to build your own tools
+
+## Getting Started 
+
+1. Create a [twitter](https://twitter.com/) account (& follow @RLadiesRTP ;]) 
+
+2. Go to [https://apps.twitter.com/](https://apps.twitter.com/) and log in with your credentials
+
+3. Click to "Create a New App"
+
+4. Utilize any website for now, and put the Callback URL as "http://localhost:1410"
+
+## Twitter App Created
+
+ - Click the "Keys and Access Tokens" tab, and scroll down to "Your Access Token"
+
+ - Select "Create My Access Token" and copy the following into R: Consumer Key, Consumer Secret, Access Token, and Access Token Secret 
+ 
+```{r, eval = FALSE}
+ # Load packages -----------------------------------------------------------
+library(twitteR)
+
+# Twitter Creds -----------------------------------------------------------
+consumer_key <- ""
+consumer_secret <- ""
+access_token <- ""
+access_secret <- ""
+
+# Set up ------------------------------------------------------------------
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+```
+
+## Exploring Twitter
+
+- $\texttt{searchTwitter}$: Search for tweets that match a desired term. The $\texttt{n}$ argument specifies the number of tweets to return, but we're generally limited to the last weeks worth of tweets
+- $\texttt{strip_retweets}$: Takes a list of status objects and remove official retweets. When "RT/MT @username" was used versus the retweet button, you can add the option of $\texttt{strip_manual=TRUE}$. 
+
+```{r, eval = FALSE}
+tweets <- searchTwitter("#rladies", n = 200, retryOnRateLimit = 120)
+stripped_rt <- strip_retweets(tweets, strip_manual = TRUE, strip_mt = TRUE)
+```
+
+## Looking @ Users
+- $\texttt{getUser}$: Take a closer look at a specific user
+- $\texttt{str(user)}$: We can poll the $\texttt{user}$ object for further information
+
+```{r, eval = FALSE}
+joyce <- getUser('joyceisms')
+str(joyce)
+joyce$getDescription()
+joyce$getFriends(n = 5)
+joyce$getFavorites(n = 5)
+```
+
+## Checking Timelines
+
+The $\texttt{twitterR}$ package supports two kinds of timelines, $user$ and $home$. The $\texttt{userTimeline}$ provides the most recent tweets of a specific user, while $\texttt{homeTimeline}$ provides your own. 
+
+```{r, eval = FALSE}
+rladies_tweets <- userTimeline("rladiesRTP")
+my_tweets <- homeTimeline()
+```
+
+## Get Trends
+
+$\texttt{getTrends}$ used to pull current trend information specified by a `Where on Earth ID` (WOEID). You can identify a WOEID [here](https://developer.yahoo.com/geo/geoplanet/) or via $\texttt{availableTrendLocations}$. 
+
+```{r eval=FALSE}
+avail_trends <- availableTrendLocations()
+closest_trends <- closestTrendLocations(35.784999, -78.666806)
+trends <- getTrends(closest_trends$woeid)
+```
+
+## Conversion to data.frames 
+
+We know how to work with lists via [purrr](http://rpubs.com/minebocek/rladies-rtp-purrr)! We can also convert to data frames. To do this, every class has a reference method $\texttt{toDataFrame}$ as well as corresponding $\texttt{S4}$ method $\texttt{as.data.frame}$. There is also a convenience method: 
+
+```{r, eval = FALSE}
+df <- twListToDF(tweets)
+View(df)
+```
+
+## Let's Visualize
+
+![Latest 100 #Thanksgiving Tweets](/home/sakitoro4/workspace/teaching/output.gif)
+
+## Database Persistence 
+We have to pay to retrieve Twitter data in the past, but if we have the ability to look ahead, Twitter API can enable prospective studies. We do this by collecting data and automatically persisting it to a [database](https://bigquery.cloud.google.com/table/prac-dataviz:rladies.df?pli=1&tab=preview). 
+
+```{r, eval = FALSE}
+library(bigrquery)
+insert_upload_job("prac-dataviz", "rladies", "df", df)
+```
+
+More on using Google BigQuery [here](https://cloud.google.com/blog/big-data/2017/07/google-cloud-platform-for-data-scientists-using-r-with-google-bigquery-part-2-storing-and-retrieving-data-frames). 
+
+## Using twitteR
+
+This tutorial only demos basic techniques, rather than exhaustive tour of functionality. But here are some links to awesome projects:
+
+[Mapping Your Followers](https://www.r-bloggers.com/an-r-function-to-map-your-twitter-followers/)
+
+[Text Mining in R](https://docs.google.com/viewerng/viewer?url=http://www.rdatamining.com/docs/RDataMining-slides-twitter-analysis.pdf)
+
+[Organizational Conversations on Twitter](https://www.asis.org/asist2012/proceedings/Submissions/185.pdf)
+
+## References
+
+Jeff Gentry's [TwitteR Vignette](http://geoffjentry.hexdump.org/twitteR.pdf)
+
+Google BigQuery's [Tutorial](https://cloud.google.com/blog/big-data/2017/07/google-cloud-platform-for-data-scientists-using-r-with-google-bigquery-part-2-storing-and-retrieving-data-frames)
+
+Michael Kearney's [rtweet package](http://rtweet.info/)
+
+My GitHub [gist](https://gist.github.com/jyuu/95217e342b2663dbdfa0a7f2864dcc18)
