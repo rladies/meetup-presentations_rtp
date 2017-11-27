@@ -99,7 +99,7 @@ View(df)
 
 ## Let's Visualize
 
-![Latest 100 #Thanksgiving Tweets](/home/sakitoro4/workspace/teaching/output.gif)
+![Latest 100 #Thanksgiving Tweets](./output.gif)
 
 ## Database Persistence 
 We have to pay to retrieve Twitter data in the past, but if we have the ability to look ahead, Twitter API can enable prospective studies. We do this by collecting data and automatically persisting it to a [database](https://bigquery.cloud.google.com/table/prac-dataviz:rladies.df?pli=1&tab=preview). 
