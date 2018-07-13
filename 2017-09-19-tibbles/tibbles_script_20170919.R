@@ -35,6 +35,10 @@
 # install packages (if you haven't already. only need to do this once!)
 install.packages("tidyverse")
 install.packages("microbenchmark")
+<<<<<<< HEAD
+#install.packages("tibble","microbenchmark") # if you don't want the whole tidyverse
+=======
+>>>>>>> 549196a48ab5c1d9acf5bb274c8141e2f874523b
 
 # load library
 library(tidyverse)

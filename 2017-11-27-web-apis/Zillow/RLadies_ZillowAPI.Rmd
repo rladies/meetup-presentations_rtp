@@ -1,0 +1,115 @@
+---
+title: "Zillow API"
+author: "Stephanie Zimmer"
+date: "November 26, 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Overview
+
+- Zillow API Start-up 
+- ZillowR Functions
+- Zillow API Output for a few functions
+
+
+## Zillow API Start-up
+
+- Get an API Key (https://www.zillow.com/howto/api/APIOverview.htm)
+- Install ZillowR and XML packages, tidyverse is also used but not completely necessary
+
+```{r, echo=TRUE}
+library(ZillowR)
+library(XML)
+library(tidyverse)
+```
+
+## ZillowR Functions
+Function | Brief Description
+---------|------------------
+GetChart|Generates URL for image file of historical Zestimates for specified property
+GetComps|Generates a list of comparable recent sales for a specified property
+GetDeepComps|Same as above but with more variables for comp properties
+GetSearchResults|Generates address, Zillow Property ID, and current Zestimate
+GetDeepSearchResults|Same as above but more variables including lot size, year built, square footage, etc
+
+## ZillowR Functions (cont'd)
+Function | Brief Description
+---------|------------------
+GetMonthlyPayments|For a specific loan amount, returns estimated montly payment included and estimated principal and interest and tax if zip included
+GetRateSummary|Returns current rates per loan type for specified state or national average
+GetUpdatedPropertyDetails|Returns all of the home facts that have been edited by home's owner or agent
+GetZestimate|Returns Zestimate for Zillow Property ID
+zillow_web_service_id|Function to set your Zillow Web Service ID as global option
+
+## ZillowR Functions 
+
+Most of the functions return a named list with the following:
+
+- **request** a list with the request parameters
+- **message** a list of status codes and messages returned by the API
+- **response** an XMLNode with the response from the API - no coercion is done to make it nice for R. This is why XML package is needed
+
+## Getting Started
+Always must start with loading your API Key, I am concealing mine but it's loaded in from a R script
+
+```{r, echo=TRUE}
+source("C:/Users/sazimmer/Documents/Voter/Programs/ZillowAPIKey.R")
+# This 1-line R program contains the function pulling in my API key 
+# I'm concealing this as it is a private key
+# The program is simply:
+# set_zillow_web_service_id('XXXXXXXXXX')
+# where XXXXXXXXXX is my Zillow API key
+
+```
+
+## Addresses to play with
+
+```{r, echo=TRUE, message=FALSE, results='asis'}
+NCPolAdd <- read_csv("../Data/PoliticianAddresses.csv") %>%
+  arrange(Org)
+library(knitr)
+kable(NCPolAdd[1:5,1:6])
+```
+
+## Addresses to play with (cont'd)
+
+```{r, echo=TRUE, results='asis'}
+kable(NCPolAdd[1:5,c(1,7:11)])
+GovernorInfo <- NCPolAdd %>% filter(toupper(Org)=="GOVERNOR")
+```
+
+## Examples
+```{r, echo=TRUE}
+GDSROutput <- GetDeepSearchResults(address=GovernorInfo$StreetAddress, 
+                     citystatezip = as.character(GovernorInfo$ZIP))
+typeof(GDSROutput$request)
+typeof(GDSROutput$message)
+typeof(GDSROutput$response)
+
+```
+
+## Look at the request and message pieces
+```{r, echo=TRUE}
+GDSROutput$request
+GDSROutput$message
+```
+
+## Look at the response piece
+Let's pause and look at this in RStudio
+```{r, echo=TRUE}
+#Convert this to a list where we should
+GovernorHomeList <- xmlToList(GDSROutput$response[["results"]][[1]])
+names(GovernorHomeList)
+GovernorHomeList$finishedSqFt
+```
+
+## What next?
+
+- Rarely looking at just 1 address, need to learn the style of output
+- Build your own custom functions to extract what you want - for us square footage
+- Handle cases when query isn't found - not all addresses are on Zillow
+- Use something like purrr to apply the same function to many addresses

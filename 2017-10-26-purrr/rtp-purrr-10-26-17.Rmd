@@ -1,0 +1,391 @@
+---
+title: "purrr"
+author: "Mine Cetinkaya-Rundel"
+date: "October 26, 2017"
+output: ioslides_presentation
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(emo)
+```
+
+# Welcome to R-Ladies RTP!
+
+## Materials
+
+- All source code at https://github.com/rladies/meetup-presentations_rtp/tree/master/2017-10-26-purrr
+
+- Slides at http://rpubs.com/minebocek/rladies-rtp-purrr
+
+## Acknowledgements
+
+- Charlotte Whickham - [Purrr tutorial](https://github.com/cwickham/purrr-tutorial)
+- Colin Rundel - [Functional programming](http://www2.stat.duke.edu/~cr173/Sta523_Fa17/functional.html)
+- Hadley Wickham - [Adv-R Functionals](http://adv-r.had.co.nz/Functionals.html)
+- Hadley Wickham - [R for Data Science](http://r4ds.had.co.nz/)
+- Neil Saunders - [A brief introduction to "apply" in R](http://nsaunders.wordpress.com/2010/08/20/a-brief-introduction-to-apply-in-r/)
+- Jenny Bryan - [Purrr Tutorial](https://jennybc.github.io/purrr-tutorial/)
+- [R Language Definition](http://stat.ethz.ch/R-manual/R-devel/doc/manual/R-lang.html)
+
+# Outline
+
+## Outline
+
+- Code with a lot of duplication is harder to understand, troubleshoot and maintain. The goal of this tutorial is help you remove duplication in your code by using functions that write for loops for you.
+
+- You'll learn to use the functions in the purrr package to perform iterative tasks: tasks that look like "for each _____ do _____".
+
+- The goal is to make strides towards writing code that is more readable and easier to update and so that you are ready to solve new iteration problems faster and with fewer mistakes.
+
+## Nothing new here!
+
+- You might already be solving problems **purrr** addresses with copy&paste, for loops, functions of the apply family, etc.
+
+- An alternative is using `purrr::map()` and friends.
+
+## Learning goals
+
+By the end of the workshop, you'll be able to:
+
+- Move from solving a problem on a single element, to iterating that solution over many elements with `map()`.
+- Identify when to use the typed variants of map(): map_lgl(), map_int(), walk() etc.
+- Use **purrr** to work with list columns in tibbles.
+- Leverage **purrr** to get list data into tibbles.
+
+## Packages
+
+```{r message=FALSE}
+# purrr + dplyr + ...
+library(tidyverse)
+
+# includes: sw_films, sw_people, sw_vehicles, 
+# sw_starships, sw_planets & sw_species
+library(repurrrsive)
+```
+
+
+# Functions
+
+## When to use functions
+
+The goal of a function should be to encapsulate a *small* *reusable* piece of code.
+
+- Name should make it clear what the function does (think in terms of simple verbs).
+
+- Functionality should be simple enough to be quickly understood.
+
+- The smaller and more modular the code the easier it will be to reuse elsewhere.
+
+- Better to change code in one location than code everywhere.
+
+## Function Basics {.smaller}
+
+In R functions are first order objects, this means we can work with them like any other object in R.
+
+<div class="columns-2">
+```{r}
+f = function(x) x*x
+typeof(f)
+
+list(f)
+```
+
+```{r}
+g = f
+g(3)
+
+{function(x) x*x*x}(3)
+```
+</div>
+
+## Function Parts {.smaller}
+
+The two parts of a function are the arguments (`formals`) and the code (`body`).
+
+```{r}
+gcd = function(loc1, loc2)
+{
+  deg2rad = function(deg) return(deg*pi/180)
+
+  lat1 = deg2rad( loc1[1] )
+  lat2 = deg2rad( loc2[1] )
+  long1 = deg2rad( loc1[2] )
+  long2 = deg2rad( loc2[2] )
+
+  R = 6371 # Earth mean radius in km
+  d = acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2) * cos(long2-long1)) * R
+
+  return(d) # distance in km
+}
+```
+
+## {.smaller}
+
+```{r}
+formals(gcd)
+body(gcd)
+```
+
+# purrr
+
+## purrr
+
+<img src="img/hex-purrr.png" style="float:right">
+
+A tidyverse package which improves functional programming in R with a focus on pure and type stable functions.
+
+## People in starwars
+
+```{r}
+typeof(sw_people)
+str(sw_people)
+```
+
+## How many elements are in sw_people?
+
+```{r}
+length(sw_people)
+```
+
+## Viewing lists
+
+Run this in your console:
+
+```{r eval=FALSE}
+View(sw_people)
+```
+
+Then let's answer:
+
+- Who is the first person in sw_people? *Easy, peasy!*
+- How many starships has each character been on? `r emo::ji("woman_shrugging")`
+
+## Who is the first person in sw_people?
+
+```{r}
+sw_people[[1]]  # Luke!
+```
+
+## A list inside a list
+
+```{r}
+sw_people[1]
+```
+
+## A list, dropped one level of heirachy
+
+```{r}
+sw_people[[1]]
+```
+
+## `map`
+
+```{r eval=FALSE}
+map( .x, .f, ...)
+```
+
+- For each element of `.x` do `.f`:
+
+- `.x` can be a vector, a list, or a data frame
+
+## How many starships has each character been on?
+
+```{r eval=FALSE}
+map(sw_people, _____)
+```
+
+Strategy:
+
+1. Do it for one element
+2. Turn it into a recipe
+3. Use `map()` to do it for all elements
+
+## How many starships has Luke been in?
+
+Save Luke:
+
+```{r}
+luke <- sw_people[[1]]
+```
+
+```{r}
+length(luke$starships)
+```
+
+## How many starships has Leia been in?
+
+```{r eval=FALSE}
+leia <- sw_people[[?]]
+```
+
+```{r eval=FALSE}
+length(leia$starships)
+```
+
+## How many starships has ___ been in?
+
+```{r eval=FALSE}
+___ <- sw_people[[___]]
+```
+
+```{r eval=FALSE}
+length(___$starships)
+```
+
+## Turn it into a recipe
+
+`~ length( .x $ starships)`
+
+- `~`: A formula
+- `.x`: purrr's "pronoun" for one element of our vector
+- This recipe becomes the second argument to `map()`
+
+```{r}
+map(sw_people, ~ length(.x$starships))
+```
+
+# `map()` & friends
+
+## What else?
+
+- Other types of output: `map_something`
+- Other ways of specifying `.f`
+- Other iteration functions: `map2` - variants of `map()` that iterate over multiple arguments in parallel (but I might not get to this today)
+
+## Map functions
+
+Basic functions for looping over an object and returning a value (of a specific type) - replacement for `lapply`/`sapply`/`vapply`.
+
+* `map()` - returns a list.
+
+* `map_lgl()` - returns a logical vector.
+
+* `map_int()` - returns a integer vector.
+
+* `map_dbl()` - returns a double vector.
+
+* `map_chr()` - returns a character vector.
+
+* `map_df()` / `map_dfr()` - returns a data frame by row binding.
+
+* `map_dfc()` - returns a data frame by column binding.
+
+* `walk()` - returns nothing, call function exclusively for its side effects
+
+
+## How many starships has each character been in?
+
+```{r eval=FALSE}
+map_???(sw_people, ~ length(.x[["starships"]]))
+```
+
+## How many starships has each character been in?
+
+```{r}
+map_int(sw_people, ~ length(.x[["starships"]]))
+```
+
+## What color is each characters hair?
+
+```{r eval=FALSE}
+map_???(sw_people, ~ .x[["hair_color"]]) 
+```
+
+## What color is each characters hair?
+
+```{r}
+map_chr(sw_people, ~ .x[["hair_color"]]) 
+```
+
+## Is the character male?
+
+```{r eval=FALSE}
+map_???(sw_people, ~ .x[["gender"]] == "male") 
+```
+
+## Is the character male?
+
+```{r}
+map_lgl(sw_people, ~ .x[["gender"]] == "male") 
+```
+
+## How heavy is each character?
+
+Why don't these work / what is not ideal about them? How would you fix it?
+
+```{r eval=FALSE}
+map_dbl(sw_people, ~ .x[["mass"]])
+map(sw_people, ~ .x[["mass"]])
+map_dbl(sw_people, ~ as.numeric(.x[["mass"]]))
+```
+
+## How heavy is each character?
+
+```{r}
+map_chr(sw_people, ~ .x[["mass"]]) %>%
+  readr::parse_number(na = "unknown")
+```
+
+## Another look at `map()`
+
+```{r eval=FALSE}
+map( .x, .f = ~ DO SOMETHING WITH .x)
+```
+
+`.f` can be
+
+- a formula
+- a string or integer (to extract the named/numbered element for each element)
+- a function
+
+## `.f` can be a formula
+
+What do each of these do?
+
+```{r eval=FALSE}
+map_int(sw_people, ~ length(.x[["starships"]]))
+map_chr(sw_people, ~ .x[["hair_color"]])
+map_chr(sw_people, ~ .x[["mass"]])
+```
+
+## `.f` can be a string or integer
+
+How do these compare?
+
+```{r eval=FALSE}
+map_chr(sw_people, ~ .x[["hair_color"]])
+map_chr(sw_people, "hair_color")
+```
+
+## `.f` can be a function
+
+What do these do?
+
+```{r eval=FALSE}
+char_starships <- map(sw_people, "starships")
+map_int(char_starships, length)
+```
+
+```{r eval=FALSE}
+map(sw_people, "starships") %>% map_int(length)
+map_int(sw_people, ~ length(.x[["starships"]]))
+```
+
+## An aside
+
+What's wrong with this?
+
+```{r}
+map(sw_people, "startships") %>% map_int(length)
+```
+
+## What about `sapply()` and `apply()`?
+
+Motivation for purrr:
+
+- consistent return type
+
+- useful shortcuts
+
+- consistent syntax for more complicated iteration
