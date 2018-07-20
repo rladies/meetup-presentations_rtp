@@ -1,6 +1,6 @@
 # r-ladies rtp exploring spatial data with sf workshop
 
-# last updated: 20180719
+# last updated: 20180720
 # script prepared by: sheila saia
 # contact: ssaia at ncsu dot edu
 
@@ -30,8 +30,6 @@
 # load sf and tidyverse libraries
 library(sf)
 library(tidyverse)
-library(Cairo) # ONLY FOR WINDOWS USERS!
-# NOTE! if you have a Windows machine, you'll have to change all instances of cairo_pdf() in this code to CairoPDF()
 
 # save page to your data
 my_desktop_path <- "/Users/ssaia/Desktop/"
@@ -50,7 +48,8 @@ attributes(st_geometry(se_states)) # ok, now it's set
 
 # import watershed bounds (for non-ref se plains)
 ws_bounds_seplains <- st_read(paste0(my_workshop_data_path, "spatial_data/bas_nonref_SEPlains.shp")) %>%
-  st_set_crs(5070)
+  st_set_crs(5070) %>%
+  mutate(ws_id = row_number()) # just gives watershed a unique number id
 
 # import stream gages and define projection (for all us)
 gages <- st_read(paste0(my_workshop_data_path, "spatial_data/gagesII_9322_sept30_2011.shp")) %>%
@@ -87,9 +86,15 @@ class(se_states_attribs) # we see it's just a data frame now, not an sf class
 
 # plot all se states
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 plot(se_states_geom) # for now we'll just use base R ;)
 dev.off()
+
+# NOTE on plotting:
+# througout this script we'll use pdf() because plotting spatial data with sf in the rstudio interactive plotting window can take a while
+# this is likely because rstudio interactive plotting window uses an application that has trouble plotting lots of points 
+# while exporting a pdf uses a different application that is more efficient computationally
+# if you must plot in the rstudio interactive window, try using st_simplify() before plotting
 
 # pick your state
 my_state <- se_states %>%
@@ -101,7 +106,7 @@ my_state_geom <- st_geometry(my_state)
 
 # plot your state
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 plot(my_state_geom) # for now we'll just use base R ;)
 dev.off()
 
@@ -120,7 +125,7 @@ se_states_geom_without_my_state <- st_difference(se_states_geom, my_state_geom)
 
 # plot se states without your state
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 plot(se_states_geom_without_my_state)
 dev.off()
 
@@ -131,7 +136,7 @@ dev.off()
 
 # plot my_state and se plains ws's together to take a look at our data together using geom_sf()
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 # this time we'll use ggplot!
 ggplot() + 
   geom_sf(data = ws_bounds_seplains, aes(fill = GAGE_ID)) +
@@ -142,19 +147,20 @@ dev.off()
 
 # let's look at se plains ws's in more detail by clipping them to our state bounds using st_intersection()
 my_state_ws <- st_intersection(ws_bounds_seplains, my_state_geom) # first one will define dataframe of output
-# not sure why there are 90 observations, we're expecting ~30
+# there are 90 observations here because the watersheds are overlapping...let's look into this a little more
 
-# plot intersection
+# plot intersection, use alpha to show that they're overlapping
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 ggplot() +
   geom_sf(data = my_state_geom) +
-  geom_sf(data = my_state_ws, aes(fill = GAGE_ID)) +
-  theme_bw() +
-  theme(legend.position="none")
+  geom_sf(data = my_state_ws, aes(fill = GAGE_ID), alpha = 0.5) +
+  #geom_sf(data = my_state_ws[1:20,], aes(fill = GAGE_ID), alpha = 0.5) + # just look at first 20 gages
+  theme_bw() #+
+  #theme(legend.position="none")
 dev.off()
 
-# extra credit: can someone figure out how to get the whole watershed and not just the part inside (i'm stumped!)?
+# extra credit: how would we get the whole watershed and not just the part inside the state boundary (i'm stumped too!)?
 # maybe use st_within() and some dplyr functions? it gives 1 for True (it's within) 0 for False...
 
 
@@ -163,15 +169,29 @@ dev.off()
 # let's see how sf works with the tidyverse
 
 # select gages in your state using st_intersection()
-my_gages <- st_intersection(gages, my_state_geom) # first one will define dataframe of output
+my_gages_in_state <- st_intersection(gages, my_state_geom) # first one will define dataframe of output
 
 # plot watersheds and gages for your state
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 ggplot() +
   geom_sf(data = my_state_geom) +
-  geom_sf(data = my_state_ws, aes(fill = GAGE_ID)) +
-  geom_sf(data = my_gages, size = 5) +
+  geom_sf(data = my_state_ws, aes(fill = GAGE_ID), alpha = 0.5) +
+  geom_sf(data = my_gages_in_state, size = 2) +
+  theme_bw() +
+  theme(legend.position="none")
+dev.off()
+
+# select gages in watersheds
+my_gages_in_ws <- st_intersection(gages, st_geometry(my_state_ws))
+
+# plot watersheds and gages for your state's watersheds
+setwd(my_desktop_path)
+pdf("test.pdf",width=11,height=8.5)
+ggplot() +
+  geom_sf(data = my_state_geom) +
+  geom_sf(data = my_state_ws, aes(fill = GAGE_ID), alpha = 0.5) +
+  geom_sf(data = my_gages_in_ws, size = 2) +
   theme_bw() +
   theme(legend.position="none")
 dev.off()
@@ -179,22 +199,22 @@ dev.off()
 # plot gages colored by reference or non-reference
 # reference refers to 
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 ggplot() +
   geom_sf(data = my_state_geom) +
-  geom_sf(data = my_gages, size = 5, aes(color = CLASS)) + # reference vs non-reference
+  geom_sf(data = my_gages_in_state, size = 5, aes(color = CLASS)) + # reference vs non-reference
   theme_bw()
 dev.off()
 # reference = less to no human impact on streamflow (e.g., forested with no development)
 # non-reference = human impact on streamflow (e.g., has an urban area or town)
 
 # use dplry left_join() to join gage spatial data with gage attributes
-my_gages_join <- my_gages %>%
+my_gages_join <- my_gages_in_state %>%
   left_join(climate_data, by = "STAID") # you can also join geology_data or hydrology_data depending on what you prefer
 
 # plot gages colored by reference or non-reference
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 ggplot() +
   geom_sf(data = my_state_geom) +
   geom_sf(data = my_gages_join, size = 5, aes(color = PPTAVG_BASIN)) + # average annual precipitation for the associated watershed in cm
@@ -211,7 +231,7 @@ my_gages_sel <- my_gages_join %>%
 
 # plot PPTAVG_BASIN and PPTAVG_SITE together for comparison
 setwd(my_desktop_path)
-cairo_pdf("test.pdf",width=11,height=8.5)
+pdf("test.pdf",width=11,height=8.5)
 ggplot() +
   geom_sf(data = my_state_geom) +
   geom_sf(data = my_gages_sel, size = 5, aes(color = PPTAVG)) +
@@ -229,4 +249,5 @@ dev.off()
 # 2. what is the difference between filter.sf() and filter()? why do we get an error when we try to use filter.sf() "count not find function filter.sf"
 # 3. why do some projections not read in automatically and other's do (UTM does vs Albers doesn't)
 # 4. what's the difference between some of the sf opperations like st_intersection() and st_intersects()?
-# 5. < place holder for more you or i might think of! >
+# 5. how would we get the whole watershed inside the state and not just the watershed clipped to the state boundary?
+# 6. < place holder for more you or i might think of! >
