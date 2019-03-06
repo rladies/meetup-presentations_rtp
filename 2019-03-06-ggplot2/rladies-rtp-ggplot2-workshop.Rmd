@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Materials
 
-All source code and slides at [TBD]
+All source code and slides at https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-03-06-ggplot2
 
 ## Datasets
 
@@ -510,6 +510,10 @@ http://docs.ggplot2.org/current/
 Don't forget the `ggplot2` cheatsheet!
 
 https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+
+Examples of layering
+
+https://evamaerey.github.io/ggplot_flipbook/ggplot_flipbook_xaringan.html#1
 
 # Extensions
 
