@@ -5,6 +5,7 @@
 R-Ladies RTP founded in September 2016 by Mine Cetinkaya-Rundel
 
 Co-organizer Elaine McVey
+Co-organizer Sheila Saia
 
 Send us an e-mail at *mine@rladies.org*, *elaine@rladies.org*, or *sheila@rladies.org* for further information!
 
