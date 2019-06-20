@@ -7,7 +7,7 @@ Sign up here: https://www.meetup.com/R-Ladies-RTP/events/258907954/
 While the materials for the workshop are designed for being used at the in-person
 workshop, all are welcomed to use and reuse them for learning and teaching.
 
-The slides for the workshop can be found here: [TBD]
+The slides and workshop materials can be found here: https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-03-06-ggplot2
 
 This workshop assumes no background in R but willingness to learn a scripting
 language.

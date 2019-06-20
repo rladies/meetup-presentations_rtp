@@ -1,13 +1,23 @@
 <img src="https://github.com/rladies/starter-kit/blob/master/logo/R-LadiesGlobal_RBG_online_LogoWithText_Horizontal.png" data-canonical-src="https://github.com/rladies/starter-kit/blob/master/logo/R-LadiesGlobal_RBG_online_LogoWithText_Horizontal.png" width="300" height="100" />
 
 # R-Ladies RTP
- 
+
 R-Ladies RTP founded in September 2016 by Mine Cetinkaya-Rundel
-  
+
 Co-organizer Elaine McVey
-  
-Send us an e-mail at *mine@rladies.org* or *elaine@rladies.org* for further information!
-  
+
+Co-organizer Sheila Saia
+
+Send us an e-mail at *mine@rladies.org*, *elaine@rladies.org*, or *sheila@rladies.org* for further information!
+
+## 2019
+
+[2019-03-06 Introduction to ggplot2](https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-03-06-ggplot2)
+
+## 2018
+
+[2018-07-19 Introduction to sf](https://github.com/rladies/meetup-presentations_rtp/tree/master/2018-07-19-sf)
+
 ## 2017
 
 [2017-11-27 Web APIs in R](https://github.com/rladies/meetup-presentations_rtp/tree/master/2017-11-27-web-apis)
