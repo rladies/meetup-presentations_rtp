@@ -8,6 +8,11 @@ While the materials for the workshop are designed for being used at the in-perso
 
 The slides and workshop materials can be found here: https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-06-27-blogdown
 
+Additional references: 
+https://bookdown.org/yihui/blogdown/
+https://alison.rbind.io/post/2017-06-12-up-and-running-with-blogdown/
+https://alison.rbind.io/post/2019-03-04-hugo-troubleshooting/
+
 This workshop assumes no background in R but willingness to learn a scripting language.
 
 Focus of the workshop is data visualization in R with the ggplot2 package, and not statistical data analysis.
