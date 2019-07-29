@@ -8,7 +8,7 @@ Co-organizer Elaine McVey
 
 Co-organizer Sheila Saia
 
-Send us an e-mail at *mine@rladies.org*, *elaine@rladies.org*, or *sheila@rladies.org* for further information!
+Send us an e-mail at *elaine@rladies.org* or *sheila@rladies.org* for further information!
 
 ## 2019
 
