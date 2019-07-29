@@ -14,6 +14,8 @@ Send us an e-mail at *mine@rladies.org*, *elaine@rladies.org*, or *sheila@rladie
 
 [2019-03-06 Introduction to ggplot2](https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-03-06-ggplot2)
 
+[2019-06-27 Introduction to blogdown](https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-06-27-blogdown)
+
 [2019-07-31 Introduction to R Markdown](https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-07-31-rmarkdown)
 
 ## 2018
