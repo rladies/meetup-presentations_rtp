@@ -1,0 +1,173 @@
+---
+title: "Getting started w/`blogdown`"
+author: "Joyce Cahoon"
+date: "6/25/2019"
+output: html_document
+---
+
+> All of this material is adapted from [Alison Hill's](https://summer-of-blogdown.netlify.com/) summer-of-blogdown series. Please refer to her [site](https://alison.rbind.io/) for a more thorough overview and for more content around customizing your `blogdown` site. *Thank you, Alison!*
+
+`blogdown` is an easy way to create a website using R and Hugo. It abstracts away all the hard stuff in building a website from scratch and lets you work within the comfort of R Markdown. Also, don't be deceived by the "blog" in `blogdown`, the website you make does not have to be a *blog*, it could be a portfolio, a simple landing page, a resume, whatever general-purpose site you can imagine. Given the limited time we have today, let's fire up RStudio and get started! 
+
+## Setup 
+
+First, we'll need [Hugo](https://themes.gohugo.io/academic/):
+
+```{r setup, eval = FALSE}
+install_hugo()
+hugo_version()
+update_hugo() # can also include the flag `force = TRUE` if your hugo version is less than 0.55
+```
+
+Let's create an account (or log into) [GitHub](https://github.com/): 
+
+1. Click the upper left green toggle to make a new repository.
+2. Enter any repo name of your desire (and description if you'd like).
+3. Select public. Do not initialize with a README.
+
+Restart R :) Now, make a new RStudio project by going to: `File > New Project > Version Control`. Enter the information associated with your new git repo and choose a local directory to store it all. Next, install `blogdown`: 
+
+```{r site, eval = FALSE}
+install.packages("blogdown")
+library(blogdown)
+
+new_site(theme = "gcushen/hugo-academic",
+         sample = TRUE, 
+         theme_example = TRUE, 
+         empty_dirs = TRUE,
+         to_yaml = TRUE)
+new_content() # use the add-in toggle on top! 
+serve_site() # same, use the add-in
+```
+
+What did we just do? What is happening here? 
+
+## Personalize
+
+...Unless we all want to be Nelson Bighetti, let's personalize the biography.
+
+1. Leave the serve site option on. 
+2. Locate the `_index.md` file under `content/authors/admin/_index.md` and adjust to your liking!
+3. Find a temporary `.jpg` file, rename it `avatar.jpg` and place it under `content/authors/admin/`.
+
+How does it look? What happens when you drag your `public` directory [here](https://app.netlify.com/drop)? 
+
+> Don't ever edit the `public` directory! 
+
+## Continuous Deployment
+
+Now that we have a live site (with a wonky address), sign up for [Netlify](https://www.netlify.com/). Don't worry, it's free!
+
+Notice how the process of editing your biography, serving site, then dragging your updated public directory to Netlify... could be painful? What if we could automate it?
+
+```{r, eval = FALSE}
+file.create("netlify.toml")
+```
+
+Copy and paste the following in your `.toml` file: 
+
+```{r, eval = FALSE}
+[build]
+  publish = "public"
+  command = "hugo"
+[context.production.environment]
+  HUGO_VERSION = "0.55.6"
+  HUGO_ENV = "production"
+  HUGO_ENABLEGITINFO = "true"
+[context.branch-deploy.environment]
+  HUGO_VERSION = "0.55.6"
+```
+
+Since we're utilizing Git for continuous deployment, we're going to need to edit our hidden `.gitignore` file: 
+
+```{r, eval = FALSE}
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+public/
+.DS_Store # if a windows user, Thumbs.db instead
+```
+
+Commit, and push to Git! 
+
+Up next, linking GitHub in Netlify... 
+
+Login to [Netlify](https://www.netlify.com/), then: 
+
+1. Click new site from Git.
+2. Select GitHub.
+3. Find the repository you just updated.
+4. And deploy!
+
+> Remember, always serve site before committing to GitHub!
+
+Now that we have an effortless way of updating our website, let's customize some more. 
+
+# Personalize *more*
+
+Check out the widgets under `content/home`. What happens when you change the `active` flag to false? What happens when you move these widgets to other pages? 
+
+Take some time to choose what you'd like to configure! You can also learn more about personalizing these widgets [here](https://sourcethemes.com/academic/docs/page-builder/#personalizing-widgets). And as you customize, if you accidently delete a widget, you can always retrieve an original copy under `themes/hugo-academic/exampleSite/content/home`. However, do NOT edit the `themes`! If you ever want to customize anything in `themes`, do it under your `layouts` folder. This will save you a lot of headache, especially if any updates are made to the academic theme. 
+
+More things to customize:
+
+- In Netlify, click on your site, then go to `Site Settings > Site Details > Change Site Name`. Here you can change the domain to something that might be more *you*. Copy this new domain name into the `baseurl` field in your `config.toml` file located in your project directory. 
+- Check out `config/_default/params.toml`. Tinker around with the color, font, highlight style, anything you see here. 
+- Also check out the `config/_default/menus.toml`. Tinker around with your navbar! 
+
+> Don't forget to serve site for the changes to take effect. 
+
+# Post!
+
+While you might not want to create a blog, let's step thru this exercise for fun. Go back to the `Addins` menu, and select `New Post`. Insert any title, author, date, categories and tag. Select `.Rmd` (we're going to run some `R` code in this post). In the past, inserting images and other meta data into a blog post was a little convoluted... you had to place images in static folders, you had to make sure you were linking to the right directory (relative to your current one)... but today, we have [page bundles](https://alison.rbind.io/post/2019-02-21-hugo-page-bundles/)! Activate this option by:
+
+```{r, eval = FALSE}
+library(usethis)
+edit_r_profile(scope = "project")
+```
+
+In the file that opens, copy and paste the following. *Make sure to include an empty line at the bottom of this file!* 
+
+```{r, eval = FALSE}
+options(blogdown.author = "[YOUR NAME]",
+        blogdown.ext = ".Rmd",
+        blogdown.subdir = "post",
+        blogdown.yaml.empty = TRUE,
+        blogdown.new_bundle = TRUE,
+        blogdown.title_case = TRUE)
+rprofile <- Sys.getenv("R_PROFILE_USER", "~/.Rprofile")
+if (file.exists(rprofile)) {
+  source(file = rprofile)
+}
+```
+
+Restart R!
+
+Let's navigate back to editing that post... and insert a image! Locate an image in your computer, and copy it over to the folder associated with your post. If this image was called `silly.png`, you can simply reference it a number of ways... 
+
+One way: `![Insert image caption](silly.png)`
+
+Another way: `knitr::include_graphics("silly.png")` 
+
+> Serve site!
+
+Does it work? If it doesn't, what might be the issue? 
+
+Some additional challenges we should work thru: 
+
+1. Try adding some `R` code to your post.
+2. Add a link in your blog post that references another section in your site.
+3. Try reading in a data! 
+
+# Finishing Touches
+
+1. What if I don't like my Netlify address? There's [rbind.io](https://github.com/rbind/support/issues)! You'll hear back pretty quickly when you get your domain. With this domain, you'll need to update on Netlify, as well as the `baseurl` in your `config.toml`. 
+2. Why do some people have links that begin with `https` and others with `http`? We'll enforce `https`. Create a file called `_redirects` in your `static/` folder. Copy the following line into it: `http://alison.rbind.io/*    https://alison.rbind.io/:splat  301!`
+3. Add your blog's feed to [RWeekly.org](https://rweekly.org/submit). 
+4. And so much more... way better material [here](https://summer-of-blogdown.netlify.com/day-04/). 
+
+> Again, many thanks for coming and to [Alison Hill](https://twitter.com/apreshill) for all this content. Please check out her twitter and blog for more material that will help you along your `blogdown` adventure <3
+
+
+
