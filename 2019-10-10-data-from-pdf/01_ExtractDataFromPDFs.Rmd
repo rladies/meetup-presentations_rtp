@@ -1,0 +1,133 @@
+---
+title: "Extracting Data from PDFs"
+author: "Stephanie Zimmer"
+date: "10/7/2019"
+output: 
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Intro and Source
+
+This example is based on a real world work example of mine. We do surveys of prisoners and received a list of prisoners in a scanned PDF. For this example, I've generated a PDF similar to the real one using synthetic data. We first work with the machine readable PDF and then the scanned one.
+
+# First we load the packages
+
+```{r}
+library(pdftools)
+library(tabulizer)
+library(tidyverse)
+
+```
+
+# Demonstrating pdftools package
+
+```{r}
+# Get metadata about the PDF
+PDFInfo <- pdftools::pdf_info("00_GeneratePDF.pdf")
+
+# Get the text of the PDF
+
+txt <- pdftools::pdf_text("00_GeneratePDF.pdf")
+
+# txt is a character vector where each page is a piece of the vector
+# e.g., txt[1] is the text for page 1
+
+txt
+
+writeLines(txt[1])
+
+
+
+```
+
+We could use parsing to parse the data from the table in the PDF, but tabulizer may prove more helpful. I will demonstrate parsing, as time allows.
+
+# Demonstrating using tabulizer
+
+```{r}
+
+extTables <- tabulizer::extract_tables("00_GeneratePDF.pdf",
+                                       output="data.frame")
+glimpse(extTables)
+
+
+
+
+
+```
+
+# Importing the scanned PDF
+
+It is much more tricky and error-prone to read in a scanned PDF or PDF that is not machine readable. We use the tesseract package to read in the PDF. It has OCR software and is powerful.
+
+```{r}
+library(tesseract)
+
+txtScan <- tesseract::ocr("00_GeneratePDF_scanned.pdf")
+str(txtScan)
+writeLines(txtScan[[1]])
+
+
+
+```
+
+Let's work just with page 1. We know that each line ends in "\n" so let's take advanatage of that and separate it by that.
+
+```{r}
+
+FirstTibble <- tibble(AllDat=str_split(txtScan[[1]], "\n")[[1]])
+
+head(FirstTibble)
+tail(FirstTibble)
+
+
+```
+
+Now, we need to remove the header and footer. Then try to separate into multiple columns.
+
+```{r}
+Tibble2 <- FirstTibble %>%
+  filter(!(str_sub(AllDat, 1,10) %in% c("10/17/2019", "XX Departm", "150 People", "Age Date o"))) %>%
+  filter(AllDat != "")
+
+head(Tibble2)
+tail(Tibble2)
+
+Tibble3 <- Tibble2 %>%
+  separate(AllDat, into=c("Age", "DOB", "ID1", "ID2", "LName", "Fname", "Place", "Cell"), sep=" ", remove=FALSE, convert=TRUE)
+
+Tibble3 %>% slice(c(9, 22, 23)) %>% pull(AllDat)
+
+head(Tibble3)
+tail(Tibble3)
+
+```
+
+It looks like this isn't converting very well. For example, the ZZCF location isn't converting correctly at all. We can tinker with how the images are processed to help improve this.
+
+```{r}
+
+pngClearer <- 
+  pdftools::pdf_convert("00_GeneratePDF_scanned.pdf",
+                        dpi=900,
+                        filenames=str_c("00_GeneratePDF_scanned_", 1:3, "_alt.png"))
+
+txtClearer <- pngClearer %>%
+  tesseract::ocr()
+
+```
+
+```{r}
+
+AllDat=str_split(txtClearer[[1]], "\n")[[1]]
+
+AllDat
+
+```
+
+This really isn't much clearer and will need some manual work.

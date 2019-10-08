@@ -1,0 +1,258 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={XX Department of Corrections},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{XX Department of Corrections}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{fancyhdr, lastpage}
+\pagestyle{fancyplain}
+\fancyhf{}
+\rhead{10/17/2019 17:56:18}
+\lfoot{150 People}
+\rfoot{Page \thepage of \pageref{LastPage}}
+
+\begin{document}
+\maketitle
+
+\begin{tabular}{cccclll}
+ {\textbf{Age}} & {\textbf{Date of Birth}} & {\textbf{NCDC\#}} & {\textbf{Offender\#}} & {\textbf{Offender Name}} & {\textbf{Location}} & {\textbf{Cell}} \\ 
+  \hline
+ 52 & 11/06/1966 & 24672 & 706169 & Perez, Kuliana & ZZCF & XX5-M101 \\ 
+   38 & 02/13/1981 & 21893 & 901279 & Blueeyes, Brittany & ZZCF & XX3-1114A \\ 
+   77 & 09/27/1942 & 50872 & 571941 & Santacruz, Crystal & ZZCF & XX5-L101 \\ 
+   38 & 07/21/1981 & 38476 & 980778 & Price, Molly & ZZCF & XX3-1110A \\ 
+   58 & 08/19/1961 & 72013 & 712810 & Byers, Aryan & ZZCF & XX5-L104 \\ 
+   28 & 06/13/1991 & 94521 & 642542 & Hood, Shelby & ZZCF & XX1-B101 \\ 
+   20 & 10/07/1999 & 39595 & 594894 & Johnson, Tashina & ZZCF & XX4-J108 \\ 
+   34 & 03/10/1985 & 53564 & 330973 & Chase, Asli & ZZCF & XX3-1105A \\ 
+   81 & 03/27/1938 & 35174 & 589531 & el-Harroun, Muneefa & ZZCF & XX4-K102 \\ 
+   54 & 05/25/1965 & 21513 & 153175 & al-Younan, Nadheera & ZZCF & XX2-F104 \\ 
+   72 & 05/29/1947 & 80247 & 828363 & Juarez, Sarahy & ZZCF & XX3-1123A \\ 
+   78 & 07/09/1941 & 61715 & 387909 & Williams, Brechelle & ZZCF & XX3-1122B \\ 
+   25 & 08/03/1994 & 35899 & 213496 & al-Emami, Yaasmeena & ZZCF & XX5-O101 \\ 
+   52 & 01/04/1967 & 29448 & 668652 & Sidara, Julia & ZZCF & XX3-1117A \\ 
+   87 & 07/21/1932 & 33781 & 179719 & el-Ismail, Suhaad & ZZCF & XX3-1104A \\ 
+   56 & 10/03/1963 & 52517 & 685582 & Reno, Autumn & ZZCF & XX4-I108 \\ 
+   67 & 10/04/1952 & 54085 & 657316 & al-Arif, Hikma & ZZCF & XX3-1101B \\ 
+   47 & 11/17/1971 & 73925 & 874270 & Smith, Rebekah & ZZCF & XX2-E105 \\ 
+   68 & 05/09/1951 & 67879 & 637466 & Shahi, Jennifer & ZZCF & XX2-E104 \\ 
+   24 & 04/03/1995 & 67144 & 586885 & Bedford, Rachel & ZZCF & XX1-C101 \\ 
+   56 & 09/06/1963 & 70795 & 250288 & Busby, Jacqueline & ZZCF & XX5-N107 \\ 
+   39 & 05/20/1980 & 98202 & 792944 & Watkins, Amanda & ZZCF & XX1-A106 \\ 
+   43 & 11/10/1975 & 96801 & 684942 & Houdek, Alyssa & ZZCF & XX2-F106 \\ 
+   28 & 07/28/1991 & 81711 & 100377 & Li, Raveena & ZZCF & XX5-N106 \\ 
+   25 & 02/28/1994 & 17411 & 344945 & Cranny, Hannah & ZZCF & XX2-F101 \\ 
+   24 & 08/18/1995 & 69350 & 104636 & Poole, Jacquelyn & ZZCF & XX2-G105 \\ 
+   58 & 01/11/1961 & 65436 & 487567 & Ditorrice, Nikki & ZZCF & XX2-H108 \\ 
+   45 & 03/14/1974 & 45543 & 772574 & Amen, Sheela & ZZCF & XX3-1112A \\ 
+   78 & 12/17/1940 & 40129 & 923147 & Asuncion, Nicole & ZZCF & XX1-D105 \\ 
+   74 & 09/03/1945 & 33767 & 419059 & el-Hares, Hanoona & ZZCF & XX2-E103 \\ 
+   66 & 06/10/1953 & 13175 & 609617 & Melbrod, Danielle & ZZCF & XX5-O103 \\ 
+   47 & 11/24/1971 & 81882 & 886636 & Bass, Auna & ZZCF & XX4-J101 \\ 
+   49 & 11/27/1969 & 70134 & 231479 & Fluckes, Helen & ZZCF & XX2-G106 \\ 
+   40 & 07/08/1979 & 69533 & 508911 & Ramos, Samantha & ZZCF & XX2-E107 \\ 
+   84 & 02/24/1935 & 37677 & 242471 & Rodriguez, Jessica & ZZCF & XX5-O105 \\ 
+   62 & 11/07/1956 & 62668 & 608128 & Linsenbigler, Marissa & ZZCF & XX3-1102A \\ 
+   50 & 01/22/1969 & 68053 & 800953 & Seiler, Aryan & ZZCF & XX2-E102 \\ 
+   88 & 03/14/1931 & 13071 & 213264 & Svenby, Adalise & ZZCF & XX3-1121A \\ 
+   89 & 06/25/1930 & 30532 & 332993 & Armijo, Roxana & ZZCF & XX2-E106 \\ 
+   22 & 08/23/1997 & 34869 & 159434 & Sarmiento, Linh & ZZCF & XX3-1111A \\ 
+   85 & 05/12/1934 & 65282 & 896924 & Sawyer, Georgina & ZZCF & XX5-L103 \\ 
+   52 & 09/29/1967 & 97949 & 370255 & Reyes-Juarez, Arianna & ZZCF & XX3-1123B \\ 
+   35 & 01/04/1984 & 71095 & 642331 & Holub, Riley & ZZCF & XX5-M103 \\ 
+   61 & 11/29/1957 & 13026 & 994546 & Garrison, Carissa & ZZCF & XX5-M107 \\ 
+   71 & 09/05/1948 & 82831 & 369149 & Wade, Allyssa & ZZCF & XX1-D101 \\ 
+   55 & 03/22/1964 & 81412 & 435893 & Kim, Belicia & ZZCF & XX1-C106 \\ 
+   47 & 04/22/1972 & 58346 & 262885 & Rudnick, Kylie & ZZCF & XX3-1112B \\ 
+   63 & 08/23/1956 & 16699 & 678034 & Walker, Kuneeshah & ZZCF & XX3-1124B \\ 
+   52 & 04/20/1967 & 76813 & 193181 & Johnson-Rhoades, Tiara & ZZCF & XX5-N104 \\ 
+  \end{tabular}
+\begin{tabular}{cccclll}
+ {\textbf{Age}} & {\textbf{Date of Birth}} & {\textbf{NCDC\#}} & {\textbf{Offender\#}} & {\textbf{Offender Name}} & {\textbf{Location}} & {\textbf{Cell}} \\ 
+  \hline
+ 87 & 10/18/1931 & 91524 & 117461 & Wilkins, Morgan & ZZCF & XX3-1106A \\ 
+   60 & 04/02/1959 & 75487 & 923913 & Nguyen, Thy Thy & ZZCF & XX3-1119A \\ 
+   60 & 03/23/1959 & 15722 & 426841 & Garcia, Sara & ZZCF & XX2-G103 \\ 
+   80 & 10/11/1938 & 49158 & 480684 & Martinez, Quianah & ZZCF & XX3-1111B \\ 
+   31 & 07/19/1988 & 67463 & 555371 & Quintanilla, Rachel & ZZCF & XX3-1116A \\ 
+   37 & 09/15/1982 & 84845 & 914228 & Werner, Chykeiljah & ZZCF & XX3-1105B \\ 
+   20 & 04/23/1999 & 28093 & 674441 & el-Soltani, Rayyana & ZZCF & XX3-1118A \\ 
+   42 & 11/24/1976 & 52978 & 672537 & Lee, Kristina & ZZCF & XX2-H106 \\ 
+   39 & 12/28/1979 & 51008 & 403567 & Elden, Selena & ZZCF & XX3-1117B \\ 
+   42 & 08/01/1977 & 38144 & 201797 & Murphy, Patricia & ZZCF & XX5-O106 \\ 
+   32 & 11/22/1986 & 53070 & 980059 & Knight, Kimberly & ZZCF & XX3-1113A \\ 
+   67 & 05/05/1952 & 45980 & 265648 & Bugosh, Olivia & ZZCF & XX3-1107B \\ 
+   66 & 03/17/1953 & 18467 & 620785 & Bolek, Danielle & ZZCF & XX5-M108 \\ 
+   83 & 05/04/1936 & 67798 & 470926 & Latham, Jana & ZZCF & XX3-1107A \\ 
+   22 & 01/08/1997 & 49347 & 782852 & Charron, Megan & ZZCF & XX4-I104 \\ 
+   79 & 03/09/1940 & 95410 & 967366 & Baldino, Jennifer & ZZCF & XX3-1124A \\ 
+   44 & 02/19/1975 & 96059 & 518816 & Arce Mendez, Adriana & ZZCF & XX1-A104 \\ 
+   49 & 02/21/1970 & 56309 & 956635 & Mack, Lazarea & ZZCF & XX3-1109B \\ 
+   85 & 02/15/1934 & 43234 & 335488 & el-Anwar, Musheera & ZZCF & XX3-1108B \\ 
+   86 & 12/21/1932 & 15778 & 366887 & Ruiz, Vanessa & ZZCF & XX2-H107 \\ 
+   42 & 01/31/1977 & 55274 & 877274 & Gallegos, Ashley & ZZCF & XX2-F107 \\ 
+   46 & 04/14/1973 & 60809 & 428565 & Godinez-Salmeron, Elena & ZZCF & XX4-I106 \\ 
+   88 & 11/01/1930 & 20458 & 725577 & Johnson, Jessica & ZZCF & XX5-L102 \\ 
+   66 & 08/26/1953 & 68152 & 100685 & Simpson, Ashley & ZZCF & XX4-K106 \\ 
+   55 & 09/04/1964 & 83877 & 994933 & Brady, Alana & ZZCF & XX4-J103 \\ 
+   35 & 09/11/1984 & 58191 & 486931 & Tatum, Tara & ZZCF & XX4-K101 \\ 
+   59 & 10/18/1959 & 71556 & 935857 & Kalu, Jazmine & ZZCF & XX2-F102 \\ 
+   78 & 03/01/1941 & 89492 & 277604 & al-Sharif, Sahheeda & ZZCF & XX2-F105 \\ 
+   89 & 08/22/1930 & 24635 & 943073 & Bradshaw, Norma & ZZCF & XX2-F103 \\ 
+   51 & 03/20/1968 & 98397 & 805205 & el-Bari, Najlaa & ZZCF & XX3-1110B \\ 
+   37 & 03/25/1982 & 43485 & 758016 & al-Qasim, Sultana & ZZCF & XX1-C102 \\ 
+   71 & 08/11/1948 & 57395 & 206712 & Brown, Briana & ZZCF & XX3-1115A \\ 
+   42 & 05/06/1977 & 31984 & 827205 & Burds, Elizabeth & ZZCF & XX1-B107 \\ 
+   44 & 01/23/1975 & 67724 & 368852 & al-Allam, Aarifa & ZZCF & XX2-H101 \\ 
+   83 & 12/15/1935 & 54669 & 108701 & De La Cerda, Ashlee & ZZCF & XX3-1109A \\ 
+   21 & 07/05/1998 & 69590 & 777416 & el-Nasser, Jasra & ZZCF & XX1-A105 \\ 
+   61 & 08/19/1958 & 34967 & 380458 & Larsen, Cassandra & ZZCF & XX2-E108 \\ 
+   81 & 08/30/1938 & 49200 & 305640 & Mcclain, Breanna & ZZCF & XX2-G108 \\ 
+   34 & 09/13/1985 & 49496 & 349797 & Salazar, Frankie & ZZCF & XX1-C105 \\ 
+   76 & 07/11/1943 & 97229 & 178120 & Kim, Jordynn & ZZCF & XX2-G104 \\ 
+   55 & 04/07/1964 & 16949 & 277915 & Littlefield, Marisa & ZZCF & XX1-D108 \\ 
+   88 & 11/22/1930 & 89733 & 291805 & al-Rahmani, Fidda & ZZCF & XX4-I101 \\ 
+   63 & 10/10/1955 & 82363 & 840837 & Truman, Camille & ZZCF & XX1-D106 \\ 
+   32 & 05/17/1987 & 32387 & 156118 & Hidalgo, Amara & ZZCF & XX5-L107 \\ 
+   52 & 09/09/1967 & 88800 & 433112 & Bohm, Katie & ZZCF & XX3-1114B \\ 
+   65 & 11/14/1953 & 99880 & 342615 & Huynh, Tomasina & ZZCF & XX4-K104 \\ 
+   41 & 02/17/1978 & 42901 & 406174 & Miller, Shannon & ZZCF & XX1-D103 \\ 
+   69 & 04/24/1950 & 82841 & 534221 & Hornbeak, Megan & ZZCF & XX3-1108A \\ 
+   54 & 11/27/1964 & 59975 & 180356 & el-Hosseini, Jaleela & ZZCF & XX1-B102 \\ 
+   44 & 04/15/1975 & 33151 & 789828 & Olivas, Angelique & ZZCF & XX1-C107 \\ 
+   85 & 04/15/1934 & 11953 & 916782 & Romero, Eunicia & ZZCF & XX4-J106 \\ 
+  \end{tabular}
+\begin{tabular}{cccclll}
+ {\textbf{Age}} & {\textbf{Date of Birth}} & {\textbf{NCDC\#}} & {\textbf{Offender\#}} & {\textbf{Offender Name}} & {\textbf{Location}} & {\textbf{Cell}} \\ 
+  \hline
+ 59 & 08/10/1960 & 13880 & 343542 & Ciarlelli, Kaitlei & ZZCF & XX4-K103 \\ 
+   83 & 06/30/1936 & 77104 & 307105 & Brown, Marian & ZZCF & XX1-C103 \\ 
+   43 & 07/29/1976 & 88738 & 814460 & Thomas, Naznet & ZZCF & XX1-A103 \\ 
+   78 & 03/04/1941 & 47558 & 234106 & Kier, Kayla & ZZCF & XX5-M106 \\ 
+   26 & 08/20/1993 & 88175 & 466058 & Guerrero, Alejandra & ZZCF & XX5-O104 \\ 
+   79 & 01/24/1940 & 39743 & 926914 & el-Mahfouz, Muna & ZZCF & XX1-B103 \\ 
+   80 & 06/26/1939 & 63852 & 607032 & Collins, Selena & ZZCF & XX3-1104B \\ 
+   45 & 07/17/1974 & 40264 & 974333 & Martin, Ashley & ZZCF & XX5-M102 \\ 
+   60 & 12/10/1958 & 11015 & 443988 & Boxley, Tasia & ZZCF & XX1-B108 \\ 
+   57 & 07/11/1962 & 83827 & 481793 & Lujan, Kara & ZZCF & XX3-1103A \\ 
+   87 & 06/04/1932 & 48723 & 181782 & Linga, Jaque & ZZCF & XX1-C104 \\ 
+   19 & 02/19/2000 & 89157 & 292404 & Young, Nkeonye & ZZCF & XX2-H103 \\ 
+   57 & 05/19/1962 & 16414 & 327701 & Sobczak, Kayla & ZZCF & XX4-I102 \\ 
+   37 & 10/16/1981 & 29246 & 545122 & Aguirre, Alissa & ZZCF & XX1-C108 \\ 
+   74 & 10/16/1944 & 45260 & 394127 & Pedroza, Elenni & ZZCF & XX4-I105 \\ 
+   31 & 05/07/1988 & 29308 & 761211 & Foutz, Katelyn & ZZCF & XX2-G107 \\ 
+   57 & 04/06/1962 & 56042 & 917160 & Chang, Maya & ZZCF & XX3-1101A \\ 
+   80 & 09/28/1939 & 21036 & 473535 & Saddler, Debra & ZZCF & XX2-H104 \\ 
+   52 & 11/01/1966 & 95064 & 170851 & Britton, Shanika & ZZCF & XX1-A107 \\ 
+   38 & 11/02/1980 & 84446 & 462818 & Batjargal, Avery & ZZCF & XX2-F108 \\ 
+   70 & 04/17/1949 & 88259 & 242759 & Lightford, Cassidy & ZZCF & XX4-J107 \\ 
+   42 & 10/18/1976 & 92628 & 994842 & Mills, Winona & ZZCF & XX4-K107 \\ 
+   54 & 12/05/1964 & 26766 & 639644 & Patterson, Vanessa & ZZCF & XX1-A102 \\ 
+   48 & 01/17/1971 & 25635 & 224281 & Chung, Adrie & ZZCF & XX5-O108 \\ 
+   85 & 01/10/1934 & 99126 & 735604 & Turner, Chantz & ZZCF & XX2-H102 \\ 
+   27 & 04/12/1992 & 41962 & 294567 & Gause, Fortun & ZZCF & XX5-L108 \\ 
+   52 & 08/29/1967 & 10995 & 322669 & al-Dib, Khadeeja & ZZCF & XX1-A101 \\ 
+   31 & 07/24/1988 & 95996 & 989664 & el-Hamidi, Hasnaa & ZZCF & XX2-E101 \\ 
+   50 & 01/09/1969 & 86978 & 633844 & Bacon, Brittany & ZZCF & XX3-1122A \\ 
+   50 & 03/31/1969 & 32965 & 593825 & Xiong, Shauntel & ZZCF & XX4-J105 \\ 
+   50 & 02/26/1969 & 45019 & 518291 & Mars, Esther & ZZCF & XX5-O107 \\ 
+   36 & 07/13/1983 & 42561 & 217699 & Colorow, Tashena & ZZCF & XX4-K105 \\ 
+   38 & 09/07/1981 & 88754 & 487396 & Left Hand Bull, Kylina & ZZCF & XX3-1113B \\ 
+   37 & 04/19/1982 & 10829 & 824695 & al-Wahba, Hamna & ZZCF & XX3-1119B \\ 
+   20 & 06/17/1999 & 95006 & 729699 & Nguyen, Vy & ZZCF & XX3-1115B \\ 
+   54 & 08/04/1965 & 24915 & 862783 & Jauregui, Melisa & ZZCF & XX1-A108 \\ 
+   65 & 08/20/1954 & 93233 & 147804 & Lee, Megan & ZZCF & XX5-L105 \\ 
+   56 & 12/09/1962 & 80047 & 161360 & Lopez, Aspen & ZZCF & XX4-K108 \\ 
+   30 & 02/13/1989 & 80998 & 882338 & Radford, Addis & ZZCF & XX3-1121B \\ 
+   71 & 07/15/1948 & 46514 & 933686 & Hall, Alana & ZZCF & XX5-M104 \\ 
+   21 & 05/18/1998 & 25611 & 555598 & Leon, Karina & ZZCF & XX3-1106B \\ 
+   43 & 05/23/1976 & 62969 & 389020 & el-Khalili, Haseena & ZZCF & XX5-O102 \\ 
+   52 & 12/20/1966 & 94907 & 765051 & Pham, Gwendolyn & ZZCF & XX5-N101 \\ 
+   48 & 12/12/1970 & 44338 & 833880 & Washington, Precious & ZZCF & XX5-N103 \\ 
+   40 & 09/03/1979 & 98425 & 542022 & Colbert, Makayla & ZZCF & XX1-D107 \\ 
+   77 & 11/11/1941 & 49345 & 689776 & Engdahl, Heather & ZZCF & XX5-N108 \\ 
+   44 & 02/17/1975 & 48761 & 661242 & Aguilar Miranda, Tanya & ZZCF & XX4-J104 \\ 
+   34 & 02/14/1985 & 66662 & 240700 & al-Abed, Sahheeda & ZZCF & XX1-B104 \\ 
+   28 & 03/07/1991 & 39394 & 171530 & Howard, Jamila & ZZCF & XX4-I103 \\ 
+   89 & 04/27/1930 & 82544 & 849895 & Johnson, Claudia & ZZCF & XX3-1118B \\ 
+  \end{tabular}
+
+
+\end{document}

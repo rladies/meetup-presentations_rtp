@@ -1,0 +1,96 @@
+---
+title: "XX Department of Corrections"
+header-includes:
+- \usepackage{fancyhdr, lastpage}
+- \pagestyle{fancyplain}
+- \fancyhf{}
+- \rhead{10/17/2019 17:56:18}
+- \lfoot{150 People}
+- \rfoot{Page \thepage of \pageref{LastPage}}
+output: 
+  pdf_document:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r generatedata, echo=FALSE, message=FALSE}
+#https://stackoverflow.com/questions/25329375/creating-a-footer-for-every-page-using-r-markdown
+set.seed(553)
+
+
+library(randomNames)
+library(tidyverse)
+
+N <- 150
+
+NamesRandomized <- randomNames(n=N, gender=1, return.complete.data = TRUE)
+
+calc_age <- function(birthDate, refDate = Sys.Date()) {
+#https://gist.github.com/mmparker/7254445
+  require(lubridate)
+  period <- as.period(interval(birthDate, refDate),
+                      unit = "year")
+  period$year
+}
+
+Unit1 <- str_c("XX1", str_c(rep(letters[1:4], each=8), 101:108), sep="-") %>%
+  str_to_upper()
+Unit2 <- str_c("XX2", str_c(rep(letters[5:8], each=8), 101:108), sep="-") %>%
+  str_to_upper()
+Unit3 <- str_c("XX3", str_c(rep(1101:1124, each=2), c("A", "B")), sep="-")
+Unit4 <- str_c("XX4", str_c(rep(letters[9:11], each=8), 101:108), sep="-") %>%
+  str_to_upper()
+Unit5 <- str_c("XX5", str_c(rep(letters[12:15], each=8), 101:108), sep="-") %>%
+  str_to_upper()
+
+
+RosterTable <- as_tibble(NamesRandomized) %>%
+  mutate(DOB=sample(seq(as.Date('1929/01/01'), as.Date('2001/01/01'), by="day"), N),
+         Age=calc_age(DOB),
+         DOB=format(DOB, format="%m/%d/%Y"),
+         IDNumber=sample(10000:99999, N),
+         AltIDNumber=sample(100000:999999, N),
+         Location="ZZCF",
+         Cell=sample(c(Unit1, Unit2, Unit3, Unit4, Unit5), N),
+         Name=str_c(last_name, first_name, sep=", ")) %>%
+  select(Age, `Date of Birth`=DOB, `NCDC\\#`=IDNumber, `Offender\\#`=AltIDNumber, `Offender Name`=Name, Location, Cell) 
+
+
+
+```
+
+
+```{r maketable1, results='asis', echo=FALSE, message=FALSE}
+options(xtable.comment = FALSE)
+
+library(xtable)
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+
+tab1 <- RosterTable %>% slice(1:49)
+tab2 <- RosterTable %>% slice(50:100)
+tab3 <- RosterTable %>% slice(101:150)
+
+tabout1 <- xtable(tab1)
+align(tabout1) <- "lcccclll"
+print(tabout1, include.colnames=TRUE, include.rownames = FALSE,
+      hline.after=0, floating=FALSE,
+      sanitize.colnames.function=bold)
+
+tabout2 <- xtable(tab2)
+align(tabout2) <- "lcccclll"
+print(tabout2, include.colnames=TRUE, include.rownames = FALSE,
+      hline.after=0, floating=FALSE,
+      sanitize.colnames.function=bold)
+
+tabout3 <- xtable(tab3)
+align(tabout3) <- "lcccclll"
+print(tabout3, include.colnames=TRUE, include.rownames = FALSE,
+      hline.after=0, floating=FALSE,
+      sanitize.colnames.function=bold)
+
+
+```
+
