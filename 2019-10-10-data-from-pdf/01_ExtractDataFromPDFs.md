@@ -46,6 +46,68 @@ library(tidyverse)
 # Get metadata about the PDF
 PDFInfo <- pdftools::pdf_info("00_GeneratePDF.pdf")
 
+PDFInfo
+```
+
+```
+## $version
+## [1] "1.5"
+## 
+## $pages
+## [1] 3
+## 
+## $encrypted
+## [1] FALSE
+## 
+## $linearized
+## [1] FALSE
+## 
+## $keys
+## $keys$Author
+## [1] ""
+## 
+## $keys$Title
+## [1] "XX Department of Corrections"
+## 
+## $keys$Subject
+## [1] ""
+## 
+## $keys$Creator
+## [1] "LaTeX with hyperref package"
+## 
+## $keys$Producer
+## [1] "pdfTeX-1.40.18"
+## 
+## $keys$Keywords
+## [1] ""
+## 
+## $keys$Trapped
+## [1] ""
+## 
+## $keys$PTEX.Fullbanner
+## [1] "This is MiKTeX-pdfTeX 2.9.6354 (1.40.18)"
+## 
+## 
+## $created
+## [1] "2019-10-09 20:05:16 EDT"
+## 
+## $modified
+## [1] "2019-10-09 20:05:16 EDT"
+## 
+## $metadata
+## [1] ""
+## 
+## $locked
+## [1] FALSE
+## 
+## $attachments
+## [1] FALSE
+## 
+## $layout
+## [1] "no_layout"
+```
+
+```r
 # Get the text of the PDF
 
 txt <- pdftools::pdf_text("00_GeneratePDF.pdf")
@@ -130,7 +192,7 @@ We could use parsing to parse the data from the table in the PDF, but tabulizer 
 ```r
 extTables <- tabulizer::extract_tables("00_GeneratePDF.pdf",
                                        output="data.frame")
-glimpse(extTables)
+str(extTables)
 ```
 
 ```
@@ -160,6 +222,40 @@ glimpse(extTables)
 ##   ..$ Location     : chr [1:50] "ZZCF" "ZZCF" "ZZCF" "ZZCF" ...
 ##   ..$ Cell         : chr [1:50] "XX4-K103" "XX1-C103" "XX1-A103" "XX5-M106" ...
 ```
+
+```r
+glimpse(extTables[[1]])
+```
+
+```
+## Observations: 49
+## Variables: 7
+## $ Age           <int> 52, 38, 77, 38, 58, 28, 20, 34, 81, 54, 72, 78, ...
+## $ Date.of.Birth <chr> "11/06/1966", "02/13/1981", "09/27/1942", "07/21...
+## $ NCDC.         <int> 24672, 21893, 50872, 38476, 72013, 94521, 39595,...
+## $ Offender.     <int> 706169, 901279, 571941, 980778, 712810, 642542, ...
+## $ Offender.Name <chr> "Perez, Kuliana", "Blueeyes, Brittany", "Santacr...
+## $ Location      <chr> "ZZCF", "ZZCF", "ZZCF", "ZZCF", "ZZCF", "ZZCF", ...
+## $ Cell          <chr> "XX5-M101", "XX3-1114A", "XX5-L101", "XX3-1110A"...
+```
+
+We can compare to the original data and see they are exactly the same.
+
+
+```r
+BigTable <- bind_rows(extTables) %>%
+  as_tibble()
+
+TrueTable <- read_rds("RosterTibble.rds") %>%
+  set_names(names(BigTable))
+
+all_equal(BigTable, TrueTable)
+```
+
+```
+## [1] TRUE
+```
+
 
 # Importing the scanned PDF
 

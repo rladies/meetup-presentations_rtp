@@ -392,7 +392,63 @@ library(tidyverse)</code></pre>
 <pre class="r"><code># Get metadata about the PDF
 PDFInfo &lt;- pdftools::pdf_info(&quot;00_GeneratePDF.pdf&quot;)
 
-# Get the text of the PDF
+PDFInfo</code></pre>
+<pre><code>## $version
+## [1] &quot;1.5&quot;
+## 
+## $pages
+## [1] 3
+## 
+## $encrypted
+## [1] FALSE
+## 
+## $linearized
+## [1] FALSE
+## 
+## $keys
+## $keys$Author
+## [1] &quot;&quot;
+## 
+## $keys$Title
+## [1] &quot;XX Department of Corrections&quot;
+## 
+## $keys$Subject
+## [1] &quot;&quot;
+## 
+## $keys$Creator
+## [1] &quot;LaTeX with hyperref package&quot;
+## 
+## $keys$Producer
+## [1] &quot;pdfTeX-1.40.18&quot;
+## 
+## $keys$Keywords
+## [1] &quot;&quot;
+## 
+## $keys$Trapped
+## [1] &quot;&quot;
+## 
+## $keys$PTEX.Fullbanner
+## [1] &quot;This is MiKTeX-pdfTeX 2.9.6354 (1.40.18)&quot;
+## 
+## 
+## $created
+## [1] &quot;2019-10-09 20:05:16 EDT&quot;
+## 
+## $modified
+## [1] &quot;2019-10-09 20:05:16 EDT&quot;
+## 
+## $metadata
+## [1] &quot;&quot;
+## 
+## $locked
+## [1] FALSE
+## 
+## $attachments
+## [1] FALSE
+## 
+## $layout
+## [1] &quot;no_layout&quot;</code></pre>
+<pre class="r"><code># Get the text of the PDF
 
 txt &lt;- pdftools::pdf_text(&quot;00_GeneratePDF.pdf&quot;)
 
@@ -463,7 +519,7 @@ txt</code></pre>
 <h1>Demonstrating using tabulizer</h1>
 <pre class="r"><code>extTables &lt;- tabulizer::extract_tables(&quot;00_GeneratePDF.pdf&quot;,
                                        output=&quot;data.frame&quot;)
-glimpse(extTables)</code></pre>
+str(extTables)</code></pre>
 <pre><code>## List of 3
 ##  $ :&#39;data.frame&#39;:    49 obs. of  7 variables:
 ##   ..$ Age          : int [1:49] 52 38 77 38 58 28 20 34 81 54 ...
@@ -489,6 +545,25 @@ glimpse(extTables)</code></pre>
 ##   ..$ Offender.Name: chr [1:50] &quot;Ciarlelli, Kaitlei&quot; &quot;Brown, Marian&quot; &quot;Thomas, Naznet&quot; &quot;Kier, Kayla&quot; ...
 ##   ..$ Location     : chr [1:50] &quot;ZZCF&quot; &quot;ZZCF&quot; &quot;ZZCF&quot; &quot;ZZCF&quot; ...
 ##   ..$ Cell         : chr [1:50] &quot;XX4-K103&quot; &quot;XX1-C103&quot; &quot;XX1-A103&quot; &quot;XX5-M106&quot; ...</code></pre>
+<pre class="r"><code>glimpse(extTables[[1]])</code></pre>
+<pre><code>## Observations: 49
+## Variables: 7
+## $ Age           &lt;int&gt; 52, 38, 77, 38, 58, 28, 20, 34, 81, 54, 72, 78, ...
+## $ Date.of.Birth &lt;chr&gt; &quot;11/06/1966&quot;, &quot;02/13/1981&quot;, &quot;09/27/1942&quot;, &quot;07/21...
+## $ NCDC.         &lt;int&gt; 24672, 21893, 50872, 38476, 72013, 94521, 39595,...
+## $ Offender.     &lt;int&gt; 706169, 901279, 571941, 980778, 712810, 642542, ...
+## $ Offender.Name &lt;chr&gt; &quot;Perez, Kuliana&quot;, &quot;Blueeyes, Brittany&quot;, &quot;Santacr...
+## $ Location      &lt;chr&gt; &quot;ZZCF&quot;, &quot;ZZCF&quot;, &quot;ZZCF&quot;, &quot;ZZCF&quot;, &quot;ZZCF&quot;, &quot;ZZCF&quot;, ...
+## $ Cell          &lt;chr&gt; &quot;XX5-M101&quot;, &quot;XX3-1114A&quot;, &quot;XX5-L101&quot;, &quot;XX3-1110A&quot;...</code></pre>
+<p>We can compare to the original data and see they are exactly the same.</p>
+<pre class="r"><code>BigTable &lt;- bind_rows(extTables) %&gt;%
+  as_tibble()
+
+TrueTable &lt;- read_rds(&quot;RosterTibble.rds&quot;) %&gt;%
+  set_names(names(BigTable))
+
+all_equal(BigTable, TrueTable)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="importing-the-scanned-pdf" class="section level1">
 <h1>Importing the scanned PDF</h1>

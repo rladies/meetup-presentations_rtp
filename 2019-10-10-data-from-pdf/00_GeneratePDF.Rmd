@@ -58,7 +58,7 @@ RosterTable <- as_tibble(NamesRandomized) %>%
          Name=str_c(last_name, first_name, sep=", ")) %>%
   select(Age, `Date of Birth`=DOB, `NCDC\\#`=IDNumber, `Offender\\#`=AltIDNumber, `Offender Name`=Name, Location, Cell) 
 
-
+write_rds(RosterTable, "RosterTibble.rds")
 
 ```
 
