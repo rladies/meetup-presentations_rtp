@@ -18,6 +18,8 @@ Send us an e-mail at *sheila@rladies.org* or *elaine@rladies.org* for further in
 
 [2019-07-31 Introduction to R Markdown](https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-07-31-rmarkdown)
 
+[2019-10-10 Reading Data from PDFs](https://github.com/rladies/meetup-presentations_rtp/tree/master/2019-10-10-data-from-pdf)
+
 ## 2018
 
 [2018-07-19 Introduction to sf](https://github.com/rladies/meetup-presentations_rtp/tree/master/2018-07-19-sf)
