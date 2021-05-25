@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Common Statistical Tests in R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Stephanie Zimmer, RTI International" />
+    <meta name="date" content="2021-05-26" />
+    <script src="Slides_files/header-attrs-2.7/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Common Statistical Tests in R
+## t-tests, linear regression, and ANOVA
+### Stephanie Zimmer, RTI International
+### 2021-05-26
+
+---
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.small .remark-code { /*Change made here*/
+  font-size: 80% !important;
+}
+.smaller .remark-code { /*Change made here*/
+  font-size: 70% !important;
+}
+&lt;/style&gt;
+
+## Topics
+
+- formula notation
+- linear regression
+- ANOVA
+- t-tests
+  - one-sample t-tests
+  - two-sample t-tests
+  - paired t-test
+???
+Everything is a linear model at the end of the day. Helper function for t.test but will also show how to do as the more generic `lm` function
+
+---
+
+## Formula notation
+
+To do any modeling, need to understand how to specify formulas in R
+
+Most basic formula:
+
+
+```r
+Y ~ X
+Y ~ X + Z
+```
+
+- left side of formula is response/dependent variable
+- right side of formula is predictor/independent variable(s)
+
+If these are linear models, this is written mathematically as:
+
+`$$Y_i=\beta_0+\beta X_i+\epsilon_i$$`
+
+`$$Y_i =\beta_0+\beta_1 X_{i}+\beta_2 Z_{i}$$`
+.footnote[Sources: https://faculty.chicagobooth.edu/richard.hahn/teaching/formulanotation.pdf, ]
+
+---
+## Formula notation - no intercept
+
+`$$Y_i=\beta_1X_i+\epsilon_i$$`
+
+
+```r
+Y ~ X - 1
+Y ~ X + 0
+```
+
+---
+## Formula notation - interactions
+
+`$$Y_i=\beta_0+\beta_1X_i+\beta_2Z_i+\beta_3X_iZ_i+\epsilon_i$$`
+
+
+```r
+Y ~ X + Z + X:Z  #X:Z makes interaction between X and Z
+Y ~ X * Z  #X*Z includes the variables and the interaction between them
+```
+
+---
+## Formula notation - most common uses
+
+Symbol | Example | Meaning
+-|-|-
++|`+X`|include this variable
+-|`-X`|delete this variable
+:|`X:Z`|include the interaction between these variables
+* |`X*Z`|include these variables and the interactions between them
+^n |`(X+Z+Y)^3`|include these variables and all interactions up to n way
+I |`I(X-Z)`| as-as: include a new variable which is the difference of these variables
+
+---
+## Formula notation - knowledge check
+
+I want to model the following:
+   
+`$$mpg_i=\beta_0+\beta_1cyl_{i}+\beta_2disp_{i}+\beta_3hp_{i}+\beta_4cyl_{i}disp_{i}+\beta_5cyl_{i}hp_{i}+\beta_6disp_{i}hp_{i}+\epsilon_i$$`
+      
+How can you write this formula? Select all that apply:
+
+1. `mpg~cyl:disp:hp`
+2. `mpg~(cyl+disp+hp)^2`
+3. `mpg~cyl+disp+hp+cyl:disp+cyl:hp+disp:hp`
+4. `mpg~cyl*disp*hp`
+5. `mpg~cyl*disp+cyl*hp+disp*hp`
+
+---
+## Formula notation - knowledge check (solution)
+
+I want to model the following:
+   
+`$$mpg_i=\beta_0+\beta_1cyl_{i}+\beta_2disp_{i}+\beta_3hp_{i}+\beta_4cyl_{i}disp_{i}+\beta_5cyl_{i}hp_{i}+\beta_6disp_{i}hp_{i}+\epsilon_i$$`
+      
+How can you write this formula? Select all that apply:
+
+1. `mpg~cyl:disp:hp` - no, this only has the interactions
+2. `mpg~(cyl+disp+hp)^2` - yes
+3. `mpg~cyl+disp+hp+cyl:disp+cyl:hp+disp:hp` - yes
+4. `mpg~cyl*disp*hp` - no, this also has the 3-way interaction
+5. `mpg~cyl*disp+cyl*hp+disp*hp` - yes
+
+There may be other ways as well!!!
+
+---
+## Data for exercises
+
+- Using `palmerpenguins` data for examples
+
+- Data were collected and made available by Dr. Kristen Gorman and the Palmer Station, Antarctica LTER, a member of the Long Term Ecological Research Network.
+
+- Access data through `palmerpenguins` package https://github.com/allisonhorst/palmerpenguins/
+
+
+```r
+library(palmerpenguins)
+library(tidyverse)
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel~
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse~
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, ~
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, ~
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186~
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, ~
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male~
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007~
+```
+
+
+
+---
+## Linear regression - simple linear regression
+
+Model penguin body mass as function of flipper length
+
+```r
+o &lt;- lm(body_mass_g ~ flipper_length_mm, data = penguins)
+o
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ flipper_length_mm, data = penguins)
+## 
+## Coefficients:
+##       (Intercept)  flipper_length_mm  
+##          -5780.83              49.69
+```
+
+---
+## Linear regression - simple linear regression
+
+
+
+```r
+summary(o)
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ flipper_length_mm, data = penguins)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1058.80  -259.27   -26.88   247.33  1288.69 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       -5780.831    305.815  -18.90   &lt;2e-16 ***
+## flipper_length_mm    49.686      1.518   32.72   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 394.3 on 340 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.759,	Adjusted R-squared:  0.7583 
+## F-statistic:  1071 on 1 and 340 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## Linear regression - multiple linear regression
+
+Model penguin body mass as function of flipper length and bill length
+
+
+```r
+lm(body_mass_g ~ flipper_length_mm + bill_length_mm, data = penguins) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ flipper_length_mm + bill_length_mm, 
+##     data = penguins)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1090.5  -285.7   -32.1   244.2  1287.5 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       -5736.897    307.959 -18.629   &lt;2e-16 ***
+## flipper_length_mm    48.145      2.011  23.939   &lt;2e-16 ***
+## bill_length_mm        6.047      5.180   1.168    0.244    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 394.1 on 339 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:   0.76,	Adjusted R-squared:  0.7585 
+## F-statistic: 536.6 on 2 and 339 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## Linear regression - multiple linear regression
+
+How would I model penguin mody mass as a function of flipper length and bill length and also include an interaction?
+
+
+```r
+lm(body_mass_g~######,
+     data=penguins)
+```
+
+--
+
+
+```r
+lm(body_mass_g ~ flipper_length_mm * bill_length_mm, data = penguins) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ flipper_length_mm * bill_length_mm, 
+##     data = penguins)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1040.18  -283.07   -23.94   241.93  1241.40 
+## 
+## Coefficients:
+##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                      5090.5088  2925.3007   1.740 0.082740 .  
+## flipper_length_mm                  -7.3085    15.0321  -0.486 0.627145    
+## bill_length_mm                   -229.2424    63.4334  -3.614 0.000347 ***
+## flipper_length_mm:bill_length_mm    1.1998     0.3224   3.721 0.000232 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 386.8 on 338 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.7694,	Adjusted R-squared:  0.7674 
+## F-statistic: 375.9 on 3 and 338 DF,  p-value: &lt; 2.2e-16
+```
+
+???
+Also `flipper_length_mm+bill_length_mm+flipper_length_mm:bill_length_mm`
+
+--- 
+## ANOVA - one-way
+
+Does average penguin mass vary by species?
+
+
+```r
+penguins %&gt;%
+    ggplot(aes(x = species, y = body_mass_g)) + geom_boxplot()
+```
+
+```
+## Warning: Removed 2 rows containing non-finite values (stat_boxplot).
+```
+
+![](Slides_files/figure-html/anovabp-1.png)&lt;!-- --&gt;
+
+---
+## ANOVA - one-way using lm
+
+Does average penguin mass vary by species?
+
+
+```r
+lm(body_mass_g ~ species, data = penguins) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ species, data = penguins)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1126.02  -333.09   -33.09   316.91  1223.98 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       3700.66      37.62   98.37   &lt;2e-16 ***
+## speciesChinstrap    32.43      67.51    0.48    0.631    
+## speciesGentoo     1375.35      56.15   24.50   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 462.3 on 339 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.6697,	Adjusted R-squared:  0.6677 
+## F-statistic: 343.6 on 2 and 339 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## ANOVA - one-way using aov
+
+Does average penguin mass vary by species?
+
+
+```r
+aov(body_mass_g ~ species, data = penguins)
+```
+
+```
+## Call:
+##    aov(formula = body_mass_g ~ species, data = penguins)
+## 
+## Terms:
+##                   species Residuals
+## Sum of Squares  146864214  72443483
+## Deg. of Freedom         2       339
+## 
+## Residual standard error: 462.2744
+## Estimated effects may be unbalanced
+## 2 observations deleted due to missingness
+```
+
+```r
+coefficients(aov(body_mass_g ~ species, data = penguins))
+```
+
+```
+##      (Intercept) speciesChinstrap    speciesGentoo 
+##       3700.66225         32.42598       1375.35401
+```
+
+---
+## ANOVA - two-way 
+Does average penguin mass vary by species and sex?
+
+
+```r
+penguins %&gt;%
+    filter(!is.na(sex)) %&gt;%
+    ggplot(aes(x = species, y = body_mass_g)) + geom_boxplot() + facet_wrap(~sex)
+```
+
+![](Slides_files/figure-html/anova2bp-1.png)&lt;!-- --&gt;
+
+---
+## ANOVA - two-way 
+Does average penguin mass vary by species and sex?
+
+
+```r
+lm(body_mass_g ~ species * sex, data = penguins) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ species * sex, data = penguins)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -827.21 -213.97   11.03  206.51  861.03 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)               3368.84      36.21  93.030  &lt; 2e-16 ***
+## speciesChinstrap           158.37      64.24   2.465  0.01420 *  
+## speciesGentoo             1310.91      54.42  24.088  &lt; 2e-16 ***
+## sexmale                    674.66      51.21  13.174  &lt; 2e-16 ***
+## speciesChinstrap:sexmale  -262.89      90.85  -2.894  0.00406 ** 
+## speciesGentoo:sexmale      130.44      76.44   1.706  0.08886 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 309.4 on 327 degrees of freedom
+##   (11 observations deleted due to missingness)
+## Multiple R-squared:  0.8546,	Adjusted R-squared:  0.8524 
+## F-statistic: 384.3 on 5 and 327 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## t-test: one-sample with lm
+
+On average, are penguin body masses significantly different from half a kg (5000 g)?
+
+
+```r
+lm(I(body_mass_g - 5000) ~ 1, data = penguins) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = I(body_mass_g - 5000) ~ 1, data = penguins)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1501.8  -651.8  -151.8   548.2  2098.2 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -798.25      43.36  -18.41   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 802 on 341 degrees of freedom
+##   (2 observations deleted due to missingness)
+```
+
+---
+## t-test: one-sample with t.test (A)
+
+On average, are penguin body masses significantly different from half a kg (5000 g)?
+
+
+```r
+t.test(I(body_mass_g - 5000) ~ 1, data = penguins)
+```
+
+```
+## 
+## 	One Sample t-test
+## 
+## data:  I(body_mass_g - 5000)
+## t = -18.408, df = 341, p-value &lt; 2.2e-16
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  -883.5417 -712.9496
+## sample estimates:
+## mean of x 
+## -798.2456
+```
+
+---
+## t-test: one-sample with t.test (B)
+
+On average, are penguin body masses significantly different from half a kg (5000 g)?
+
+
+```r
+t.test(penguins$body_mass_g - 5000)
+```
+
+```
+## 
+## 	One Sample t-test
+## 
+## data:  penguins$body_mass_g - 5000
+## t = -18.408, df = 341, p-value &lt; 2.2e-16
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  -883.5417 -712.9496
+## sample estimates:
+## mean of x 
+## -798.2456
+```
+
+---
+## t-test: two-sample with lm
+Is penguin weight significantly different between males and females?
+
+
+```r
+lm(body_mass_g ~ sex, data = penguins) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ sex, data = penguins)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1295.7  -595.7  -237.3   737.7  1754.3 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  3862.27      56.83  67.963  &lt; 2e-16 ***
+## sexmale       683.41      80.01   8.542  4.9e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 730 on 331 degrees of freedom
+##   (11 observations deleted due to missingness)
+## Multiple R-squared:  0.1806,	Adjusted R-squared:  0.1781 
+## F-statistic: 72.96 on 1 and 331 DF,  p-value: 4.897e-16
+```
+
+---
+## t-test: two-sample with t.test
+Is penguin weight significantly different between males and females?
+
+
+```r
+t.test(body_mass_g ~ sex, data = penguins, var.equal = TRUE)
+```
+
+```
+## 
+## 	Two Sample t-test
+## 
+## data:  body_mass_g by sex
+## t = -8.5417, df = 331, p-value = 4.897e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -840.8014 -526.0222
+## sample estimates:
+## mean in group female   mean in group male 
+##             3862.273             4545.685
+```
+
+---
+## paired t-test: introduce data
+Is the cost of books on Amazon cheaper than the bookstore?
+
+
+
+```r
+library(openintro)
+glimpse(textbooks)
+```
+
+```
+## Rows: 73
+## Columns: 7
+## $ dept_abbr &lt;fct&gt; Am Ind, Anthro, Anthro, Anthro, Art His, Art His, Asia Am, A~
+## $ course    &lt;fct&gt;  C170, 9, 135T, 191HB, M102K, 118E, 187B, 191E, C125, M145B,~
+## $ isbn      &lt;fct&gt; 978-0803272620, 978-0030119194, 978-0300080643, 978-02262068~
+## $ ucla_new  &lt;dbl&gt; 27.67, 40.59, 31.68, 16.00, 18.95, 14.95, 24.70, 19.50, 123.~
+## $ amaz_new  &lt;dbl&gt; 27.95, 31.14, 32.00, 11.52, 14.21, 10.17, 20.06, 16.66, 106.~
+## $ more      &lt;fct&gt; Y, Y, Y, Y, Y, Y, Y, N, N, Y, Y, N, Y, Y, N, N, N, N, N, N, ~
+## $ diff      &lt;dbl&gt; -0.28, 9.45, -0.32, 4.48, 4.74, 4.78, 4.64, 2.84, 17.59, 3.7~
+```
+
+```r
+textbooks %&gt;%
+    ggplot(aes(x = ucla_new, y = amaz_new)) + geom_point() + geom_abline(slope = 1, 
+    intercept = 0)
+```
+
+![](Slides_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+## paired t-test: lm
+Is the cost of books on Amazon different than the bookstore?
+
+
+
+```r
+lm(ucla_new - amaz_new ~ 1, data = textbooks) %&gt;%
+    summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = ucla_new - amaz_new ~ 1, data = textbooks)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -22.292  -8.962  -4.532   4.828  53.238 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   12.762      1.668   7.649 6.93e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 14.26 on 72 degrees of freedom
+```
+
+---
+## paired t-test: t.test
+Is the cost of books on Amazon different than the bookstore?
+
+
+
+```r
+t.test(textbooks$ucla_new, textbooks$amaz_new, paired = TRUE)
+```
+
+```
+## 
+## 	Paired t-test
+## 
+## data:  textbooks$ucla_new and textbooks$amaz_new
+## t = 7.6488, df = 72, p-value = 6.928e-11
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##   9.435636 16.087652
+## sample estimates:
+## mean of the differences 
+##                12.76164
+```
+
+
+
+
+
+---
+## Linear models - good resource
+
+Great resource: https://lindeloev.github.io/tests-as-linear/ 
+
+---
+## Sources
+
+- Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/ 
+
+- https://faculty.chicagobooth.edu/richard.hahn/teaching/formulanotation.pdf 
+
+- https://stat.ethz.ch/R-manual/R-devel/library/stats/html/formula.html
+
+- https://lindeloev.github.io/tests-as-linear/
+
+- Mine &amp;Ccedil;etinkaya-Rundel, David Diez, Andrew Bray, Albert Y. Kim, Ben Baumer, Chester Ismay, Nick Paterno and Christopher Barr (2021). openintro: Data Sets and Supplemental Functions from 'OpenIntro' Textbooks and Labs. R package version 2.1.0. https://CRAN.R-project.org/package=openintro
+
+- Diez, David M., Christopher D. Barr, and Mine &amp;Ccedil;etinkaya-Rundel. OpenIntro statistics, Fourth Edition. OpenIntro, 2019.
+
+---
+## ANCOVA 
+After controlling for flipper length, is body mass the same for all species?
+
+
+```r
+penguins %&gt;%
+    ggplot(aes(x = flipper_length_mm, y = body_mass_g, colour = species, group = species)) + 
+    geom_point()
+```
+
+```
+## Warning: Removed 2 rows containing missing values (geom_point).
+```
+
+![](Slides_files/figure-html/ancovaplot-1.png)&lt;!-- --&gt;
+
+---
+## ANCOVA
+After controlling for flipper length, is body mass the same for all species?
+
+
+```r
+ancout &lt;- lm(body_mass_g ~ flipper_length_mm + species, data = penguins)
+summary(ancout)
+```
+
+```
+## 
+## Call:
+## lm(formula = body_mass_g ~ flipper_length_mm + species, data = penguins)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -927.70 -254.82  -23.92  241.16 1191.68 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       -4031.477    584.151  -6.901 2.55e-11 ***
+## flipper_length_mm    40.705      3.071  13.255  &lt; 2e-16 ***
+## speciesChinstrap   -206.510     57.731  -3.577 0.000398 ***
+## speciesGentoo       266.810     95.264   2.801 0.005392 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 375.5 on 338 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.7826,	Adjusted R-squared:  0.7807 
+## F-statistic: 405.7 on 3 and 338 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## Plot ANCOVA
+After controlling for flipper length, is body mass the same for all species?
+
+
+```r
+peng2 &lt;- penguins %&gt;%
+    filter(!is.na(flipper_length_mm), !is.na(body_mass_g), !is.na(species)) %&gt;%
+    mutate(yhat = predict(ancout))
+peng2 %&gt;%
+    ggplot(aes(x = flipper_length_mm, y = body_mass_g, colour = species, group = species)) + 
+    geom_point() + geom_line(aes(y = yhat), size = 1)
+```
+
+![](Slides_files/figure-html/ancovap2-1.png)&lt;!-- --&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
