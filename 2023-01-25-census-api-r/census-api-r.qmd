@@ -1,0 +1,334 @@
+---
+title: "Census APIs in R"
+author: "Stephanie Zimmer"
+format: 
+  revealjs:
+      slide-number: true
+      theme: moon
+execute: 
+  echo: true
+  tidy: true
+  error: true
+---
+
+## Census API
+
+- What is the Census API?
+  - An API that gives access to data from many programs
+
+- Programs include:
+  - American Community Survey: tables and microdata
+  - Decennial Census
+  - Population Estimates and Projections
+  - And more
+
+- [Census documentation](https://www.census.gov/data/developers/guidance/api-user-guide.html)
+
+## Useful R packages
+
+- **censusapi**
+  - Any data program available on Census API
+  - Data is not cleaned
+
+- **tidycensus**
+  - ACS tables, ACS microdata, Decennial tables, PEP tables, and ACS migration flow data
+  - Wrappers are written so you don't have to understand the API details
+  - Data is somewhat cleaned e.g. -555555555 is changed to missing as it is a missing code
+
+## API keys
+
+- An API key is needed and needs to be requested^[https://api.census.gov/data/key_signup.html]
+
+- Bad practice to store an API key in your code
+
+- Install the API key locally
+
+
+```
+tidycensus::census_api_key("abcdefghijkl", overwrite = TRUE, install = TRUE)
+```
+
+Retrieve using:
+
+```
+Sys.getenv("CENSUS_API_KEY")
+```
+
+This will return "abcdefghijkl"
+
+## Census geographies
+
+Data may not be available for all geographies. More years of data generally means smaller areas available
+
+![](https://mcdc.missouri.edu/geography/sumlevs/censusgeochart.png){fig-alt="Census geography hierarchy figure"}
+
+## Motivating example
+
+Find number of housing units by occupancy status in each block group in Durham County, NC from ACS 2016-2020 data
+
+```{r}
+#| label: yearset
+#| cache: true
+year_select <- 2020
+```
+
+
+# censusapi package example
+
+## Workflow
+
+1. Use `listCensusApis` to find the API you are looking for
+2. Find the variables
+  + Use `listCensusMetadata` to find out more information about that specific API, or
+  + Use `makeVarlist` to identify variables you want to extract (optional)
+4. Use `getCensus` to query the data
+
+## All the APIs
+
+```{r}
+#| label: allapis
+library(tidyverse)
+library(censusapi)
+
+allAPIs <- listCensusApis()
+
+head(allAPIs)
+```
+
+## Finding our API
+
+```{r}
+#| echo: false
+#| label: allapis-display
+DT::datatable(select(allAPIs, title, name, vintage), filter = list(position = "top"), options = list(pageLength = 5, dom = "t"))
+```
+
+
+## Find variables
+
+```{r}
+#| label: findvars
+findvars <- makeVarlist(name = "acs/acs5", vintage = year_select, find = "occupancy", output = "dataframe")
+```
+
+Go to live code and variables are those in group B25002
+
+```{r}
+#| label: selectvars
+myvars <- findvars %>%
+  filter(group == "B25002") %>%
+  arrange(name) %>%
+  pull(name)
+myvars
+```
+
+If you want margin of errors as well, add those. These have same variable name but end in "M" instead of "E"
+
+```{r}
+myvars <- c(myvars, str_replace(myvars, "E$", "M")) %>% sort()
+myvars
+```
+
+
+
+## Get the data
+```{r}
+#| label: getdat
+vocc_durham <- getCensus(name = "acs/acs5", vintage = year_select, key = Sys.getenv("CENSUS_API_KEY"), vars = myvars, region = "tract:*", regionin = "state:37+county:063", show_call = FALSE, convert_variables = TRUE)
+
+head(vocc_durham)
+```
+
+# tidycensus package example
+
+## Workflow
+
+1. Find the variables using `load_variables`
+2. Use `get_acs`, `get_decennial`, `get_estimates`, or `get_pums` or to query the data
+
+## Find variables
+
+```{r}
+#| label: findvarsb
+library(tidycensus)
+library(sf)
+findvars_tidy <- load_variables(year = year_select, dataset = "acs5")
+```
+
+Go to live code and show the variables are those in group B25002
+
+```{r}
+#| label: selectvars2
+myvars_tidy <- findvars_tidy %>% filter(str_detect(name, "B25002_"))
+myvars_tidy
+```
+
+## Clean up variable labels for later
+
+```{r}
+#| label: cleannames
+myvars_labeled <- 
+  myvars_tidy %>%
+  separate(label, into = c("e", "t", "Status"), sep = "!!", fill = "right") %>%
+  mutate(Status = if_else(is.na(Status), "All", Status)) %>%
+  select(name, Status)
+
+myvars_labeled
+```
+
+## Get the data
+
+```{r}
+#| label: getdat2
+#| output: false
+#| warning: false
+vocc_durham_tidy <- get_acs(
+  geography = "tract",
+  variables = pull(myvars_labeled, name),
+  year = year_select,
+  survey = "acs5",
+  state = "37",
+  county = "063",
+  geometry = TRUE
+)
+```
+
+
+```{r}
+#| label: getdat3
+vocc_durham_tidy
+```
+
+## Label data for later
+
+
+```{r}
+#| label: labdat
+vocc_durham_tidy_lab <-
+  vocc_durham_tidy %>%
+  select(-NAME) %>%
+  left_join(myvars_labeled, by = c("variable" = "name"))
+
+vocc_durham_tidy_lab
+```
+
+## Bonus - easy map - all occupancy
+
+```{r}
+#| label: allmap
+vocc_durham_tidy_lab %>%
+  filter(Status=="All") %>%
+  ggplot(aes(fill=estimate)) +
+  geom_sf()
+```
+
+## Bonus - easy map - by occupancy status
+
+```{r}
+#| label: bymap
+vocc_durham_tidy_lab %>%
+  filter(Status!="All") %>%
+  group_by(GEOID) %>%
+  mutate(Percent=estimate/sum(estimate)*100) %>%
+  ggplot(aes(fill=Percent)) +
+  geom_sf() +
+  facet_wrap(~Status)
+```
+## tidycensus variable finding
+
+- Live coding
+
+- Audience give examples of concepts they want to look for and we explore
+
+
+# Microdata in ACS - tidycensus
+
+## Workflow
+
+1. Identify variables of interest (`pums_variables`)
+2. Identify geography of interest 
+3. Use `get_pums` to query data
+
+Warning - this data can be large!!!
+
+## Identify variables
+
+- Head over to live coding
+
+- We ultimately want: NP along with weights for PUMAs 37 01301 and 37 01302 (Durham County South and North, respectively)^[https://www.census.gov/geographies/reference-maps/2010/geo/2010-pumas/north-carolina.html]
+
+## Get the data
+
+```{r}
+#| label: gpums
+#| output: false
+#| warning: false
+#| cache: true
+#| dependson: yearset
+durh_micro <- get_pums(
+  variables=c("NP"),
+  state="37",
+  puma=c("01301", "01302"),
+  year=year_select,
+  survey="acs5",
+  variables_filter = list(TYPEHUGQ=1, SPORDER = 1),
+  rep_weights = "housing",
+  return_vacant = TRUE)
+```
+
+```{r}
+#| label: headpums
+durh_micro
+```
+
+## Analyze the data - set up survey object
+
+```{r}
+#| label: pumsan
+library(srvyr)
+
+durh_svy <- durh_micro %>%
+  mutate(Status=if_else(NP==0, "Vacant", "Occupied")) %>%
+  to_survey(type="housing", class="srvyr")
+
+durh_svy
+```
+
+## Analyze the data
+
+```{r}
+#| label: pumsan2
+results_pums <- durh_svy %>% 
+  group_by(Status) %>%
+  cascade(N=survey_total()) %>%
+  mutate(N_moe=N_se*1.645)
+
+results_pums %>% arrange(desc(N))
+```
+## Compare to table data
+
+```{r}
+#| label: pumsan3
+get_acs(
+  geography = "county", variables = pull(myvars_labeled, name), year = year_select, 
+  survey = "acs5",   state = "37",   county = "063") %>%
+  select(variable, estimate, moe) %>% 
+  left_join(myvars_labeled, by = c("variable" = "name"))
+```
+
+
+# Questions and discussion
+
+## Useful resources and links
+
+- [Census User's/Developer's Slack](https://uscensusbureau.slack.com/)
+
+- [tidycensus package website](https://walker-data.com/tidycensus/)
+
+- [censusapi package website](https://www.hrecht.com/censusapi/index.html)
+
+- [Census API documentation](https://www.census.gov/data/developers/guidance/api-user-guide.html)
+
+- [Census SF File Documentation](https://www.census.gov/programs-surveys/acs/data/summary-file/sequence-based.html)
+    - 1-year and 5-year Appendicies can show which table is available at each geo level, not 100% accurate
+    - Table Shells can be another way to find a variable outside of R
