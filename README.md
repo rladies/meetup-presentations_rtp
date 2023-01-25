@@ -6,9 +6,15 @@ R-Ladies RTP founded in September 2016 by Mine Cetinkaya-Rundel
 
 Co-organizer Sheila Saia
 
-Co-organizer Elaine McVey
+Co-organizer Kateri Salk-Gundersen
 
-Send us an e-mail at *sheila@rladies.org* or *elaine@rladies.org* for further information!
+Send us an e-mail at *sheila@rladies.org* for further information!
+
+## 2021
+
+[2021-10-13 Urban Heat Mapping TidyTuesday](https://github.com/rladies/meetup-presentations_rtp/tree/master/2021-10-13-tidytuesday-uhi)
+
+[2021-05-26 Statistical Tests](https://github.com/rladies/meetup-presentations_rtp/tree/master/2021-05-26-statistical-tests)
 
 ## 2019
 
