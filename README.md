@@ -6,9 +6,17 @@ R-Ladies RTP founded in September 2016 by Mine Cetinkaya-Rundel
 
 Co-organizer Sheila Saia
 
-Co-organizer Kateri Salk-Gundersen
+Co-organizer Jeanne McCulure
 
 Send us an e-mail at *sheila@rladies.org* for further information!
+
+
+## 2023 
+
+[2023-01-25 Accessing Census Data in R through APIs](https://github.com/rladies/meetup-presentations_rtp/tree/master/2023-01-25-census-api-r)
+
+## 2022
+
 
 ## 2021
 
