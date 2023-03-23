@@ -15,6 +15,8 @@ Send us an e-mail at *sheila@rladies.org* for further information!
 
 [2023-01-25 Accessing Census Data in R through APIs](https://github.com/rladies/meetup-presentations_rtp/tree/master/2023-01-25-census-api-r)
 
+[2023-03-22 #tidytuesday (on a Wednesday) with R-Ladies SB](https://github.com/rladies/meetup-presentations_rtp/tree/master/2023-03-22-tidytuesday)
+
 ## 2021
 
 [2021-10-13 Urban Heat Mapping TidyTuesday](https://github.com/rladies/meetup-presentations_rtp/tree/master/2021-10-13-tidytuesday-uhi)
