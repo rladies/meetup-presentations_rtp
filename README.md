@@ -17,6 +17,10 @@ Send us an e-mail at *sheila@rladies.org* for further information!
 
 [2023-03-22 #tidytuesday (on a Wednesday) with R-Ladies SB](https://github.com/rladies/meetup-presentations_rtp/tree/master/2023-03-22-tidytuesday)
 
+## 2022
+
+[2022-07-12 Spatial Data Basics with sf in R - Breakout Group Scripts](https://github.com/rladies/meetup-presentations_rtp/tree/master/2022-07-12-spatial-breakoutgroups)
+
 ## 2021
 
 [2021-10-13 Urban Heat Mapping TidyTuesday](https://github.com/rladies/meetup-presentations_rtp/tree/master/2021-10-13-tidytuesday-uhi)
