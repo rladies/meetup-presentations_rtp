@@ -1,0 +1,81 @@
+---
+title: "energy_data"
+date: "8/22/2023"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+### Data download
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(tidytuesdayR)
+
+tuesdata <- tidytuesdayR::tt_load('2023-06-06')
+tuesdata <- tidytuesdayR::tt_load(2023, week = 23)
+
+owid_energy <- tuesdata$`owid-energy`
+
+```
+
+### Data exploration
+
+```{r}
+glimpse(owid_energy)
+summary(owid_energy)
+
+```
+
+### Consumption by country
+
+```{r}
+consumption <- owid_energy %>%
+  select(country, year, population, matches("consumption")) 
+summary(consumption)
+
+consumption %>% select(country) %>% count()
+
+#narrow to post 2000
+consumption <- consumption %>%
+  filter(year >= 2000)
+
+consumption <- consumption %>%
+  drop_na()
+
+unique(consumption$country)
+
+consumption <- consumption %>%
+  pivot_longer(., -c(country, year, population), names_to = "energy_type", values_to = "consumption")
+
+time_series_plot <- ggplot(data = consumption, aes(x = year, y = consumption)) +
+  geom_line(aes(color = energy_type)) +
+  facet_wrap(~country, scales = "free_y") +
+  labs(x = "Date", y = "Consumption", title = "Time Series Plot", color = "Energy Type") +
+  theme(axis.text.x=element_text(angle = 90, vjust = 1.0))
+time_series_plot
+
+#look at these sources only
+renewables <- c("biofuel_consumption", "renewables_consumption", "fossil_fuel_consumption", "solar_consumption", "wind_consumption")
+
+these_renewables <- consumption %>% 
+  filter(energy_type  %in% renewables)
+
+time_series_plot2 <- ggplot(data = these_renewables, aes(x = year, y = consumption)) +
+  geom_line(aes(color = energy_type)) +
+  facet_wrap(~country, scales = "free_y") +
+  labs(x = "Date", y = "Consumption", title = "Time Series Plot", color = "Energy Type") +
+  theme(axis.text.x=element_text(angle = 90, vjust = 1.0))
+time_series_plot2
+
+#narrow to post 2015
+time_series_plot3 <- ggplot(data = these_renewables %>% filter(year >= 2015), aes(x = year, y = consumption)) +
+  geom_line(aes(color = energy_type)) +
+  facet_wrap(~country, scales = "free_y") +
+  labs(x = "Date", y = "Consumption", title = "Time Series Plot", color = "Energy Type") +
+  theme(axis.text.x=element_text(angle = 90, vjust = 1.0))
+time_series_plot3
+
+```
